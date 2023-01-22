@@ -37,7 +37,7 @@ jobs:
     steps:
     - name: Create Version
       id: get_version
-      run: VERSION=v$(date +%s) && echo "::set-output name=version::${VERSION}"
+      run: VERSION=v$(date +%s) && echo "::set-outputs name=version::${VERSION}"
  
     - uses: actions/checkout@v2
     - name: Install Dependencies
@@ -72,7 +72,7 @@ jobs:
         name: ${{ github.sha }}
         prerelease: true
         files: |
-              ARK-4-${{ steps.get_version.outputs.version }}.zip
-              ARK-4-${{ steps.get_version.outputs.version }}.tar.gz
-              ARK-4-${{ steps.get_version.outputs.version }}-DEBUG.zip
-              ARK-4-${{ steps.get_version.outputs.version }}-DEBUG.tar.gz
+              ARK-4-${ steps.get_version.outputs.version }.zip
+              ARK-4-${ steps.get_version.outputs.version }.tar.gz
+              ARK-4-${ steps.get_version.outputs.version }-DEBUG.zip
+              ARK-4-${ steps.get_version.outputs.version }-DEBUG.tar.gz
