@@ -29,7 +29,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' }}
         run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=should_run::false"
     steps:
-      - name: Create Version
+       - name: Create Version
         id: get_version
         run: |
           echo "VERSION=v$(date +%s)" >> $GITHUB_OUTPUT #&& echo "::set-output name=VERSION::${verson}"
@@ -39,8 +39,8 @@ jobs:
     needs: check_date
     if: ${{ needs.check_date.outputs.should_run != 'false' }}
     runs-on: ubuntu-latest
+    - uses: actions/checkout@v2
 
-       - uses: actions/checkout@v2
     - name: Install Dependencies
       run: sudo apt-get install autoconf automake bison flex gcc libmpfr-dev libncurses5-dev libreadline-dev libusb-dev make patch subversion texinfo wget git python2
     - name: Extract SDK
