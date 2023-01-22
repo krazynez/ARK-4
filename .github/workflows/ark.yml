@@ -59,7 +59,7 @@ jobs:
       run: make
     - name: Compressing dist directory up
       run: | 
-        cd ./dist && sudo tar czvf ARK-4-${ steps.get_version.ouputs.VERSION }.tar.gz * && mv ARK-4-${ steps.get_version.ouputs.VERSION }.tar.gz .. && sudo zip -r ARK-4-${ steps.get_version.ouputs.VERSION }.zip * && mv ARK-4-${ steps.get_version.ouputs.VERSION }.zip ..
+        cd ./dist && sudo tar czvf ARK-4-${{ steps.get_version.ouputs.VERSION }}.tar.gz * && mv ARK-4-${{ steps.get_version.ouputs.VERSION }}.tar.gz .. && sudo zip -r ARK-4-${{ steps.get_version.ouputs.VERSION }}.zip * && mv ARK-4-${{ steps.get_version.ouputs.VERSION }}.zip ..
     - name: Making DEBUG Version
       run: |
         make clean && make DEBUG=1 && cd ./dist && sudo tar czvf ARK-4-${echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.tar.gz * && mv ARK-4-${ echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.tar.gz .. && sudo zip -r ARK-4-${echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.zip * && mv ARK-4-${echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.zip ..
