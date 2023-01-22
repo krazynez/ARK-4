@@ -37,7 +37,7 @@ jobs:
     steps:
     - name: Create Version
       id: get_version
-      run: VERSION=v$(date +%s) && echo "::set-outputs name=version::${VERSION}"
+      run: version=v$(date +%s) && echo "::set-output name=version::${verson}"
  
     - uses: actions/checkout@v2
     - name: Install Dependencies
