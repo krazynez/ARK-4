@@ -28,8 +28,6 @@ jobs:
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'schedule' }}
         run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=should_run::false"
-    env: 
-      version: echo "VERSION=v$(date +%s)"
 
   build:
     needs: check_date
@@ -38,9 +36,9 @@ jobs:
 
     steps:
     - name: Create Version
+      id: get_version
       run: |
         echo "VERSION=v$(date +%s)" >> $GITHUB_OUTPUT #&& echo "::set-output name=VERSION::${verson}"
-      id: get_version
  
     - uses: actions/checkout@v2
     - name: Install Dependencies
@@ -61,7 +59,7 @@ jobs:
       run: make
     - name: Compressing dist directory up
       run: | 
-        cd ./dist && sudo tar czvf ARK-4-${ echo $version }.tar.gz * && mv ARK-4-${ echo $version }.tar.gz .. && sudo zip -r ARK-4-${ echo $version }.zip * && mv ARK-4-${ echo $version }.zip ..
+        cd ./dist && sudo tar czvf ARK-4-${ steps.get_version.ouputs.VERSION }.tar.gz * && mv ARK-4-${ steps.get_version.ouputs.VERSION }.tar.gz .. && sudo zip -r ARK-4-${ steps.get_version.ouputs.VERSION }.zip * && mv ARK-4-${ steps.get_version.ouputs.VERSION }.zip ..
     - name: Making DEBUG Version
       run: |
         make clean && make DEBUG=1 && cd ./dist && sudo tar czvf ARK-4-${echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.tar.gz * && mv ARK-4-${ echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.tar.gz .. && sudo zip -r ARK-4-${echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.zip * && mv ARK-4-${echo ${{ steps.get_version.ouputs.VERSION }}}-DEBUG.zip ..
