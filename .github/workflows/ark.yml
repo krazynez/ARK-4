@@ -72,7 +72,7 @@ jobs:
         name: ${{ github.sha }}
         prerelease: true
         files: |
-              ARK-4-v${{ tag_name }}.zip
-              ARK-4-v${{ tag_name }}.tar.gz
-              ARK-4-v${{ tag_name }}-DEBUG.zip
-              ARK-4-v${{ tag_name }}-DEBUG.tar.gz
+              ARK-4-v${{ steps.get_version.outputs.version }}.zip
+              ARK-4-v${{ steps.get_version.outputs.version }}.tar.gz
+              ARK-4-v${{ steps.get_version.outputs.version }}-DEBUG.zip
+              ARK-4-v${{ steps.get_version.outputs.version }}-DEBUG.tar.gz
