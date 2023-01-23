@@ -83,8 +83,8 @@ jobs:
         with:
           tag_name: ${{ steps.get_version.outputs.VERSION }} 
           name: ${{ github.sha }}
-        prerelease: true
-        files: |
+          prerelease: true
+          files: |
               ARK-4-${{ steps.get_version.outputs.VERSION }}.zip
               ARK-4-${{ steps.get_version.outputs.VERSION }}.tar.gz
               ARK-4-${{ steps.get_version.outputs.VERSION }}-DEBUG.zip
