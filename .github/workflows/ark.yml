@@ -66,6 +66,10 @@ jobs:
           sudo zip -r ARK-4-\${{ steps.get_version.ouputs.VERSION }}.zip *
           mv ARK-4-\${{ steps.get_version.ouputs.VERSION }}.zip ..
 
+      - name: list dir
+        run: |
+          ls -lrt
+
       - name: Making DEBUG Version
         run: |
           make clean
