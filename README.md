@@ -196,7 +196,7 @@ Aside from the default launcher provided, there have been many  other custom lau
 <details>
 <summary> <b> Custom Launcher Themes </b> </summary>
 <p>
-!["Red"](https://github.com/PSP-Archive/ARK-4/tree/main/.github/wallpapers/red.bmp "Red")
+!["Red"](https://github.com/krazynez/ARK-4/tree/main/.github/wallpapers/red.bmp "Red")
 </details>
 
 
