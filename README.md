@@ -193,6 +193,11 @@ ARK comes prepacked with a very powerful launcher with a built-in file browser a
 
 
 Aside from the default launcher provided, there have been many  other custom launchers created by scene members, some better looking, some with more features, some more simpler, but all of them with personality, dedication and love from the community. Here is a list of all popular menus for ARK:
+<details>
+<summary> <b> Custom Launcher Themes </b> </summary>
+<p>
+!["Red"](https://github.com/PSP-Archive/ARK-4/tree/main/.github/wallpapers/red.bmp "Red")
+</details>
 
 
 - ONEMenu by gdljjrod: https://github.com/ONElua/ONEmenu/releases
