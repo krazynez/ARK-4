@@ -77,6 +77,7 @@ body:
        - Launcher
     validations:
       required: true
+
   - type: dropdown
     id: overclock
     attributes:
@@ -92,6 +93,7 @@ body:
        - Launcher
     validations:
       required: true
+
   - type: dropdown
     id: power-save
     attributes:
@@ -107,9 +109,9 @@ body:
        - Launcher
     validations:
       required: true
-
+<div style="display: inline-block; width=48%;">
   - type: dropdown
-    id: Balanced-Energy-Mode, unlock-extra-mem
+    id: Balanced-Energy-Mode
     attributes:
       label: Balanced Energy Mode 
       options:
@@ -142,21 +144,21 @@ body:
     validations:
       required: true
   
-        #  - type: dropdown
-        #    id: unlock-extra-mem
-        #    attributes:
-        #      label: Unlock Extra Memory
-        #      options:
-        #       - Disabled
-        #       - Always
-        #       - Game
-        #       - UMD
-        #       - Homebrew
-        #       - Pops
-        #       - XMB
-        #       - Launcher
-        #    validations:
-        #      required: true
+  - type: dropdown
+    id: unlock-extra-mem
+    attributes:
+      label: Unlock Extra Memory
+      options:
+       - Disabled
+       - Always
+       - Game
+       - UMD
+       - Homebrew
+       - Pops
+       - XMB
+       - Launcher
+    validations:
+      required: true
   - type: dropdown
     id: memory-stick-speedup
     attributes:
