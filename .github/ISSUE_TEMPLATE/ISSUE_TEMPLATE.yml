@@ -60,7 +60,16 @@ body:
         
   - type: markdown
     attributes:
-      value: "<h2>Recovery settings</h2>"
+      value: "<h2>Settings</h2>"
+      
+  # Extreme hack warning!
+  - type: markdown
+    attributes:
+      value: "<table>"
+
+  - type: markdown
+    attributes:
+      value: "<tr>"
 
   - type: dropdown
     id: usb-charge
@@ -109,6 +118,10 @@ body:
        - Launcher
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: "</tr>"
 
   - type: dropdown
     id: Balanced-Energy-Mode
