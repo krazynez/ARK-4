@@ -62,20 +62,7 @@ body:
     attributes:
       value: "<h2>Settings</h2>"
       
-  # Extreme hack warning!
-  - type: markdown
-    attributes:
-      value: "<table>"
-
-  - type: markdown
-    attributes:
-      value: "<tr>"
-
-  - type: markdown
-    attributes:
-      value: "<td>"
-
-  - type: dropdown
+    - type: dropdown
     id: usb-charge
     attributes:
       label: USB Charge
@@ -90,16 +77,7 @@ body:
        - Launcher
     validations:
       required: true
-
-  - type: markdown
-    attributes:
-      value: "</td>"
-    
-  - type: markdown
-    attributes:
-      value: "<td>"
-
-  - type: dropdown
+    - type: dropdown
     id: overclock
     attributes:
       label: Overclock 
@@ -114,16 +92,7 @@ body:
        - Launcher
     validations:
       required: true
-
-  - type: markdown
-    attributes:
-      value: "</td>"
-  
-  - type: markdown
-    attributes:
-      value: "<td>"
-
-  - type: dropdown
+    - type: dropdown
     id: power-save
     attributes:
       label: Power Save
@@ -138,19 +107,8 @@ body:
        - Launcher
     validations:
       required: true
-  - type: markdown
-    attributes:
-      value: "</td>"
 
-  - type: markdown
-    attributes:
-      value: "</tr>"
-
-  - type: markdown
-    attributes:
-      value: "</table>"
-
-  - type: dropdown
+    - type: dropdown
     id: Balanced-Energy-Mode
     attributes:
       label: Balanced Energy Mode 
@@ -165,7 +123,6 @@ body:
        - Launcher
     validations:
       required: true
-
   - type: dropdown
     id: autoboot
     attributes:
@@ -175,7 +132,6 @@ body:
         - "On"
     validations:
       required: true
-  
   - type: dropdown
     id: disable-psp-go-pause
     attributes:
@@ -201,7 +157,6 @@ body:
        - Launcher
     validations:
       required: true
-        
   - type: dropdown
     id: memory-stick-speedup
     attributes:
@@ -217,7 +172,6 @@ body:
        - Launcher
     validations:
       required: true
-  
   - type: dropdown
     id: inferno-cache
     attributes:
@@ -238,7 +192,6 @@ body:
         - "On"
     validations:
        required: true
-
   - type: dropdown
     id: Hide-PIC0-and_PIC1 
     attributes:
@@ -248,7 +201,6 @@ body:
         - "On"
     validations:
        required: true
-
   - type: dropdown
     id: Hide-MAC-Address 
     attributes:
@@ -268,7 +220,6 @@ body:
         - "On"
     validations:
        required: true
-
   - type: dropdown
     id: Turn-off-LEDs 
     attributes:
