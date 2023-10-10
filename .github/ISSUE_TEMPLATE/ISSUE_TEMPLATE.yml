@@ -71,6 +71,10 @@ body:
     attributes:
       value: "<tr>"
 
+  - type: markdown
+    attributes:
+      value: "<td>"
+
   - type: dropdown
     id: usb-charge
     attributes:
@@ -86,7 +90,15 @@ body:
        - Launcher
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: "</td>"
     
+  - type: markdown
+    attributes:
+      value: "<td>"
+
   - type: dropdown
     id: overclock
     attributes:
@@ -102,7 +114,15 @@ body:
        - Launcher
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: "</td>"
   
+  - type: markdown
+    attributes:
+      value: "<td>"
+
   - type: dropdown
     id: power-save
     attributes:
@@ -118,6 +138,9 @@ body:
        - Launcher
     validations:
       required: true
+  - type: markdown
+    attributes:
+      value: "</td>"
 
   - type: markdown
     attributes:
