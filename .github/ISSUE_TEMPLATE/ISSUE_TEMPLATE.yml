@@ -109,7 +109,7 @@ body:
       required: true
 
   - type: dropdown
-    id: Balanced-Energy-Mode
+    id: Balanced-Energy-Mode, unlock-extra-mem
     attributes:
       label: Balanced Energy Mode 
       options:
@@ -142,21 +142,21 @@ body:
     validations:
       required: true
   
-  - type: dropdown
-    id: unlock-extra-mem
-    attributes:
-      label: Unlock Extra Memory
-      options:
-       - Disabled
-       - Always
-       - Game
-       - UMD
-       - Homebrew
-       - Pops
-       - XMB
-       - Launcher
-    validations:
-      required: true
+        #  - type: dropdown
+        #    id: unlock-extra-mem
+        #    attributes:
+        #      label: Unlock Extra Memory
+        #      options:
+        #       - Disabled
+        #       - Always
+        #       - Game
+        #       - UMD
+        #       - Homebrew
+        #       - Pops
+        #       - XMB
+        #       - Launcher
+        #    validations:
+        #      required: true
   - type: dropdown
     id: memory-stick-speedup
     attributes:
