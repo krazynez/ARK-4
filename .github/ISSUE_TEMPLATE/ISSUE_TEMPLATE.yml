@@ -76,6 +76,7 @@ body:
        - Pops
        - XMB
        - Launcher
+      default: 0
     validations:
       required: true
 
