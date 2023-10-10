@@ -71,7 +71,9 @@ SEConfig* sctrlSEGetConfig(SEConfig *config)
 */
 SEConfig* sctrlSEGetConfigEx(SEConfig *config, int size)
 {
-    if (config && size) memcpy(config, &se_config, size);
+    if (config && size == sizeof(SEConfig)){
+        memcpy(config, &se_config, size);
+    }
     return &se_config;
 }
 
@@ -98,8 +100,11 @@ int sctrlSESetConfig(SEConfig *config)
 */
 int sctrlSESetConfigEx(SEConfig *config, int size)
 {
-    memcpy(&se_config, config, size);
-    return 0;
+    if (config && size == sizeof(SEConfig)){
+        memcpy(&se_config, config, size);
+        return 0;
+    }
+    return -1;
 }
 
 // Return Reboot Configuration UMD File
@@ -158,7 +163,7 @@ int sctrlSEGetDiscType(void)
 
 int sctrlSEGetVersion()
 {
-	return 0x00040005;
+	return ( (ARK_MAJOR_VERSION << 24) | (ARK_MINOR_VERSION << 16) | ARK_MICRO_VERSION << 8 );
 }
 
 int sctrlSEMountUmdFromFile(char *file, int noumd, int isofs){
@@ -173,14 +178,14 @@ void sctrlSESetDiscOut(int out){
     return;
 }
 
-static int testingtool;
-
 int sctrlHENIsTestingTool()
 {
-	return testingtool == 2;
+	int k1 = pspSdkSetK1(0);
+    SceIoStat stat; int res = sceIoGetstat("flash0:/kd/vshbridge_tool.prx", &stat);
+    pspSdkSetK1(k1);
+    return (res >= 0);
 }
 
 void sctrlHENSetTestingTool(int tt)
 {
-	testingtool = tt ? 2 : 1;
 }

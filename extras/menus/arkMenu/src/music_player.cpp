@@ -10,7 +10,7 @@ static int cur_play = 0;
 static void mp3_cleanup(MP3* music){
     printf("cleaning up mp3\n");
     if (music == current_song){
-        if (cur_play+1 < playlist.size()){
+       if (cur_play+1 < playlist.size()){
             cur_play++;
             current_song = new MP3((char*)playlist[cur_play].c_str());
             current_song->on_music_end = mp3_cleanup;
@@ -21,6 +21,7 @@ static void mp3_cleanup(MP3* music){
             playlist.clear();
             cur_play = 0;
         }
+		
         delete music;
     }
 }
@@ -53,7 +54,7 @@ void MusicPlayer::draw(){
     string info = (MP3::isPaused()? string("||"):string(">"));
     common::getImage(IMAGE_DIALOG)->draw_scale(0, 0, 480, 20);
     common::printText(5, 13, info.c_str(), LITEGRAY, SIZE_MEDIUM, 1, 0);
-    common::printText(15, 13, (current_song)? current_song->getFilename() : this->path.c_str(), LITEGRAY, SIZE_MEDIUM, 1, 1);
+    common::printText(15, 13, (current_song)? current_song->getFilename() : this->path.c_str(), LITEGRAY, SIZE_MEDIUM, 1, &scroll);
 
     if (playlist.size()){
         common::getImage(IMAGE_DIALOG)->draw_scale(20, 30, 450, 235);
@@ -92,12 +93,12 @@ int MusicPlayer::control(){
         current_song = NULL;
     }
 
-    if (current_song == NULL){
-        current_song = new MP3((char*)path.c_str(), false);
+	if(current_song == NULL) {
+		current_song = new MP3((char*)path.c_str(), false);
         current_song->on_music_end = mp3_cleanup;
-        current_song->play();
-    }
-    
+		current_song->play();
+	}
+
     while (running && MP3::isPlaying()){
         pad.update();
 
@@ -127,6 +128,9 @@ int MusicPlayer::control(){
                 current_song->stop();
             }
         }
+		if(current_song == NULL && playlist.size() != 0) {
+			current_song->stop();
+		}
     }
     pad.flush();
     

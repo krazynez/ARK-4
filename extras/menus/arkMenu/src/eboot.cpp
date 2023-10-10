@@ -1,4 +1,7 @@
 #include "eboot.h"
+#include "system_mgr.h"
+#include <systemctrl.h>
+#include <kubridge.h>
 
 Eboot::Eboot(string path){
     
@@ -14,27 +17,23 @@ Eboot::Eboot(string path){
 }
 
 Eboot::~Eboot(){
-    if (this->icon0 != common::getImage(IMAGE_NOICON) && this->icon0 != common::getImage(IMAGE_WAITICON))
-        delete this->icon0;
-    if (this->header != NULL) free(this->header);
+    if (icon0 && icon0 != common::getImage(IMAGE_NOICON) && icon0 != common::getImage(IMAGE_WAITICON))
+        delete icon0;
 }
 
 void Eboot::readHeader(){
-    this->header = NULL;
-    void* data = malloc(sizeof(PBPHeader));
     FILE* fp = fopen(this->path.c_str(), "rb");
-    fread(data, 1, sizeof(PBPHeader), fp);
+    fread(&header, 1, sizeof(PBPHeader), fp);
     fclose(fp);
-    this->header = (PBPHeader*)data;
 }
 
 void Eboot::loadIcon(){
     Image* icon = NULL;
-    if (this->header->icon1_offset-this->header->icon0_offset)
-        icon = new Image(this->path, YA2D_PLACE_RAM, this->header->icon0_offset);
+    if ( header.magic == EBOOT_MAGIC && header.icon1_offset-header.icon0_offset)
+        icon = new Image(this->path, YA2D_PLACE_RAM, this->header.icon0_offset);
     
     if (icon == NULL)
-        sceKernelDelayThread(50000);
+        sceKernelDelayThread(0);
     icon = (icon == NULL)? common::getImage(IMAGE_NOICON) : icon;
     icon->swizzle();
     this->icon0 = icon;
@@ -49,16 +48,18 @@ void Eboot::getTempData1(){
     this->pic1 = NULL;
 
     int size;
+
+    if (header.magic != EBOOT_MAGIC) return;
     
     // grab pic0.png
-    size = this->header->pic1_offset-this->header->pic0_offset;
+    size = this->header.pic1_offset-this->header.pic0_offset;
     if (size)
-        this->pic0 = new Image(this->path, YA2D_PLACE_RAM, this->header->pic0_offset);
+        this->pic0 = new Image(this->path, YA2D_PLACE_RAM, this->header.pic0_offset);
 
     // grab pic1.png
-    size = this->header->snd0_offset-this->header->pic1_offset;
+    size = this->header.snd0_offset-this->header.pic1_offset;
     if (size)
-        this->pic1 = new Image(this->path, YA2D_PLACE_RAM, this->header->pic1_offset);
+        this->pic1 = new Image(this->path, YA2D_PLACE_RAM, this->header.pic1_offset);
 
 }
 
@@ -71,22 +72,24 @@ void Eboot::getTempData2(){
 
     int size;
 
+    if (header.magic != EBOOT_MAGIC) return;
+
     // grab snd0.at3
-    size = this->header->elf_offset-this->header->snd0_offset;
+    size = this->header.elf_offset-this->header.snd0_offset;
     if (size){
         this->snd0 = malloc(size);
         memset(this->snd0, 0, size);
         this->at3_size = size;
-        this->readFile(this->snd0, this->header->snd0_offset, size);
+        this->readFile(this->snd0, this->header.snd0_offset, size);
     }
 
     // grab icon1.pmf
-    size = this->header->pic0_offset-this->header->icon1_offset;
+    size = this->header.pic0_offset-this->header.icon1_offset;
     if (size){
         this->icon1 = malloc(size);
         memset(this->icon1, 0, size);
         this->icon1_size = size;
-        this->readFile(this->icon1, this->header->icon1_offset, size);
+        this->readFile(this->icon1, this->header.icon1_offset, size);
     }
 }
 
@@ -101,7 +104,7 @@ int Eboot::getEbootType(const char* path){
 
     int ret = UNKNOWN_TYPE;
 
-    if (strcasecmp("ms0:/PSP/GAME/UPDATE/EBOOT.PBP", path) == 0 || strcasecmp("ef0:/PSP/GAME/UPDATE/EBOOT.PBP", path) == 0 )
+    if (strcasecmp("ms0:/PSP/GAME/UPDATE/EBOOT.PBP", path) == 0 || strcasecmp("ef0:/PSP/GAME/UPDATE/EBOOT.PBP", path) == 0 || strcasecmp(("ms0:/PSP/APPS/UPDATE/"VBOOT_PBP), path) == 0 )
         return TYPE_UPDATER;
 
     FILE* fp = fopen(path, "rb");
@@ -162,8 +165,8 @@ string Eboot::fullEbootPath(string path, string app){
     if (common::fileExists(path+app+"/EBOOT.PBP"))
         return path+app+"/EBOOT.PBP"; // Normal EBOOT
 
-    else if (common::fileExists(path+app+"/VBOOT.PBP"))
-        return path+app+"/VBOOT.PBP"; // ARK EBOOT
+    else if (common::fileExists(path+app+VBOOT_PBP))
+        return path+app+VBOOT_PBP; // ARK EBOOT
 
     else if (common::fileExists(path+app+"/FBOOT.PBP"))
         return path+app+"/FBOOT.PBP"; // TN CEF EBOOT
@@ -193,11 +196,11 @@ char* Eboot::getSubtype(){
 SfoInfo Eboot::getSfoInfo(){
     SfoInfo info = this->Entry::getSfoInfo();
     // grab PARAM.SFO
-    u32 size = this->header->icon0_offset-this->header->param_offset;
+    u32 size = this->header.icon0_offset-this->header.param_offset;
     if (size){
 
         unsigned char* sfo_buffer = (unsigned char*)malloc(size);
-        this->readFile(sfo_buffer, this->header->param_offset, size);
+        this->readFile(sfo_buffer, this->header.param_offset, size);
 
         int title_size = sizeof(info.title);
         Entry::getSfoParam(sfo_buffer, size, "TITLE", (unsigned char*)(info.title), &title_size);
@@ -211,7 +214,7 @@ SfoInfo Eboot::getSfoInfo(){
 }
 
 bool Eboot::isEboot(const char* path){
-    return (common::getExtension(path) == "pbp" || common::getMagic(path, 0) == EBOOT_MAGIC);
+    return (common::getExtension(path) == "pbp" || strstr(path, "wmenu.bin"));
 }
 
 void Eboot::doExecute(){
@@ -220,16 +223,29 @@ void Eboot::doExecute(){
 }
 
 void Eboot::executeRecovery(const char* path){
-    struct SceKernelLoadExecVSHParam param;
-    
-    memset(&param, 0, sizeof(param));
-    
-    int runlevel = HOMEBREW_RUNLEVEL;
-    
-    param.args = strlen(path) + 1;
-    param.argp = (char*)path;
-    param.key = "game";
-    sctrlKernelLoadExecVSHWithApitype(runlevel, path, &param);
+    string fakent = string(common::getArkConfig()->arkpath) + VBOOT_PBP;
+    if (fakent != path && common::fileExists(path)){
+        struct SceKernelLoadExecVSHParam param;
+        
+        memset(&param, 0, sizeof(param));
+        
+        int runlevel = HOMEBREW_RUNLEVEL;
+        
+        param.args = strlen(path) + 1;
+        param.argp = (char*)path;
+        param.key = "game";
+        sctrlKernelLoadExecVSHWithApitype(runlevel, path, &param);
+    }
+    else {
+        string recovery_prx = string(common::getArkConfig()->arkpath) + RECOVERY_PRX;
+        SceUID modid = kuKernelLoadModule(recovery_prx.c_str(), 0, NULL);
+        if (modid >= 0){
+            int res = sceKernelStartModule(modid, recovery_prx.size() + 1, (void*)recovery_prx.c_str(), NULL, NULL);
+            if (res >= 0){
+                while (1){sceKernelDelayThread(1000000);}; // wait for recovery to finish
+            }
+        }
+    }
 }
 
 void Eboot::executeUpdate(const char* path){
@@ -285,7 +301,7 @@ void Eboot::executePOPS(const char* path){
     
     memset(&param, 0, sizeof(param));
     
-    int runlevel = (*(u32*)path == EF0_PATH && common::getConf()->redirect_ms0)? POPS_RUNLEVEL_GO : POPS_RUNLEVEL;
+    int runlevel = (*(u32*)path == EF0_PATH)? POPS_RUNLEVEL_GO : POPS_RUNLEVEL;
     
     param.args = strlen(path) + 1;
     param.argp = (char*)path;

@@ -25,8 +25,6 @@
 #include <psprtc.h>
 #include <psputilsforkernel.h>
 #include <pspthreadman_kernel.h>
-#include "systemctrl.h"
-#include "systemctrl_se.h"
 #include "systemctrl_private.h"
 #include "inferno.h"
 #include "lz4.h"
@@ -124,21 +122,11 @@ static void (*ciso_decompressor)(void* src, int src_len, void* dst, int dst_len,
 // 0x00000368
 static void wait_until_ms0_ready(void)
 {
-    int ret, status = 0, bootfrom;
-    const char *drvname;
+    int ret, status = 0;
 
-    drvname = "mscmhc0:";
+    if (sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_VSH) return; // no wait on VSH
 
-    bootfrom = sceKernelBootFrom();
-    #ifdef DEBUG
-    printk("%s: bootfrom: 0x%08X\n", __func__, bootfrom);
-    #endif
-    if(bootfrom == 0x50) {
-        drvname = "mscmhcemu0:";
-    } else {
-        // vsh mode?
-        return;
-    }
+    const char *drvname = (sctrlKernelMsIsEf())? "mscmhcemu0:" : "mscmhc0:";
 
     while( 1 ) {
         ret = sceIoDevctl(drvname, 0x02025801, 0, 0, &status, sizeof(status));

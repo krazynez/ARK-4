@@ -24,11 +24,14 @@
 
 char *settings[] =
 {
-    "Custom Firmware Settings",
-    "Plugins Manager",
+    "ARK-4 Updater",
+    "★ Custom Firmware Settings",
+    "★ Plugins Manager",
+	"Custom Launcher",
     "USB Charge",
     "Overclock",
     "PowerSave",
+    "Balanced Energy Mode",
     "Autoboot Launcher",
     "Disable Pause on PSP Go",
     "Force Extra Memory",
@@ -41,6 +44,9 @@ char *settings[] =
     "Hide MAC Address",
     "Hide DLC",
     "Turn off LEDs",
+    "Disable UMD Drive",
+    "Disable Analog Stick",
+    "PSP Overclock",
 };
 
 #endif

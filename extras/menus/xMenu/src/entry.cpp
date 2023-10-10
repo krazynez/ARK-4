@@ -30,12 +30,13 @@ Image* Entry::loadIcon(){
         if (icon != NULL)
             return icon;
     }
-    return common::getNoIcon();
+    return NULL;
 }
 
 void Entry::animAppear(){
     for (int i=480; i>=0; i-=10){
         clearScreen(CLEAR_COLOR);
+        blitAlphaImageToScreen(0, 0, 480, 272, common::getBG(), 0, 0);
         blitAlphaImageToScreen(0, 0, 480-i, 272, this->pic1, i, 0);
         flipScreen();
     }
@@ -44,6 +45,7 @@ void Entry::animAppear(){
 void Entry::animDisappear(){
     for (int i=0; i<=480; i+=10){
         clearScreen(CLEAR_COLOR);
+        blitAlphaImageToScreen(0, 0, 480, 272, common::getBG(), 0, 0);
         blitAlphaImageToScreen(0, 0, 480-i, 272, this->pic1, i, 0);
         flipScreen();
     }
@@ -62,7 +64,7 @@ string Entry::getEbootName(){
 }
         
 Image* Entry::getIcon(){
-    return this->icon0;
+    return (icon0)? icon0 : common::getNoIcon();
 }
 
 Image* Entry::getPic0(){
@@ -89,11 +91,6 @@ bool Entry::run(){
     if (this->pic0 != NULL)
         blitAlphaImageToScreen(0, 0, this->pic0->imageWidth, this->pic0->imageHeight, this->pic0, 160, 85);
     
-    common::printText(0, 0, "You have selected:");
-    common::printText(10, 10, this->name.c_str());
-    common::printText(10, 20, this->path.c_str());
-    common::printText(0, 40, "Press Cross to continue");
-    common::printText(0, 50, "Press Circle to cancel");
     common::flip();
     
     Controller control;

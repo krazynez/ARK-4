@@ -12,9 +12,10 @@
 #include "net_mgr.h"
 #include "ftp_driver.h"
 #include "exit_mgr.h"
+#include "lang.h"
 
 PSP_MODULE_INFO("ARKMENU", 0, 1, 0);
-PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
+PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_VSH|PSP_THREAD_ATTR_VFPU);
 PSP_HEAP_SIZE_KB(17*1024);
 
 using namespace std;
@@ -22,7 +23,18 @@ using namespace std;
 #define MAX_ENTRIES 5
 static SystemEntry* entries[MAX_ENTRIES];
 
+extern "C" void my_malloc_init();
+
 int main(int argc, char** argv){
+
+    // make malloc/free threadsafe
+    my_malloc_init();
+
+    srand(time(NULL));
+
+    int encoding = 5;
+    sceIoDevctl("fatms0:", 0x02425856, &encoding, 4, NULL, 0);
+    //sceIoDevctl("fatef0:", 0x02425856, &encoding, 4, NULL, 0);
 
     intraFontInit();
     ya2d_init();
@@ -30,16 +42,14 @@ int main(int argc, char** argv){
     // setup UMD disc
     sceUmdReplacePermit();
 
-    Controller pad;
-    pad.update(1);
-    bool run_last = pad.LT();
-
     // Load data (theme, config, font, etc)
     common::loadData(argc, argv);
 
+    // check to run last game
+    Controller pad;
     pad.update(1);
-
-    if (run_last || pad.LT()){
+    if (pad.LT()){
+        common::stopLoadingThread();
         const char* last_game = common::getConf()->last_game;
         if (Eboot::isEboot(last_game)){
             Eboot* eboot = new Eboot(last_game);
@@ -60,19 +70,20 @@ int main(int argc, char** argv){
         Browser::ftp_driver = new FTPDriver();
     }
     // Setup settings and exit
-    SettingsTable stab = { settings_entries, MAX_SETTINGS_OPTIONS };
+    int max_settings = MAX_SETTINGS_OPTIONS;
+    if (common::getPspModel() != PSP_GO) max_settings -= 2;
+    SettingsTable stab = { settings_entries, max_settings };
     entries[n_entries++] = new SettingsMenu(&stab, common::saveConf, false, true, true);
     entries[n_entries++] = new ExitManager();
 
     // Setup main App (Game or Browser)
     if (common::getConf()->main_menu == 0){
-        entries[1] = new Browser();
-        entries[0] = new GameManager();
-        GameManager::updateGameList(NULL);
+        entries[1] = Browser::getInstance();
+        entries[0] = GameManager::getInstance();
     }
     else{
-        entries[0] = new Browser();
-        entries[1] = new GameManager();
+        entries[0] = Browser::getInstance();
+        entries[1] = GameManager::getInstance();
     }
     
     // Initialize Menu
@@ -87,7 +98,7 @@ int main(int argc, char** argv){
     intraFontShutdown();
     ya2d_shutdown();
 
-    sceKernelExitGame();
+    sctrlKernelExitVSH(NULL);
     
     return 0;
 }

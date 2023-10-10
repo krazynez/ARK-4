@@ -90,22 +90,6 @@ void flash_ipl(int size, u16 key)
 
 }
 
-/*
-int is_ta88v3(void)
-{
-	u32 model, tachyon;
-
-	tachyon = sceSysregGetTachyonVersion();
-	model = kuKernelGetModel();
-
-	if(model == 1 && tachyon == 0x00600000) {
-		return 1;
-	}
-
-	return 0;
-}
-*/
-
 int main() 
 {
 	int devkit, size;
@@ -120,6 +104,7 @@ int main()
 		{(unsigned char*)payload_01G, size_payload_01G},
 		{(unsigned char*)payload_02G, size_payload_02G},
 		{(unsigned char*)payload_03G, size_payload_03G},
+		/*
 		{(unsigned char*)payload_04G, size_payload_04G},
 		{(unsigned char*)payload_05G, size_payload_05G},
 		{(unsigned char*)NULL, 0}, // 6g
@@ -128,8 +113,9 @@ int main()
 		{(unsigned char*)payload_09G, size_payload_09G}, // 9g
 		{(unsigned char*)NULL, 0}, // 10g
 		{(unsigned char*)payload_11G, size_payload_11G}, // 11g
-
+		*/
 	};
+
 	int supported_models = sizeof(ipl_table)/sizeof(ipl_table[0]);
 
 	pspDebugScreenInit();
@@ -140,11 +126,6 @@ int main()
 	kuKernelCall((void*)getDevkitVersion, &args);
 
 	// New cIPL should only be run via 6.61 FW
-	/*
-	if(devkit != 0x06060010 && devkit != 0x06060110) {
-		ErrorExit(5000,"FW ERROR!\n");
-	}
-	*/
 	if(args.ret1 != 0x06060110 ) {
 		ErrorExit(5000,"6.61 FW SUPPORTED ONLY!\n");
 	}

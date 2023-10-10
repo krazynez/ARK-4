@@ -21,27 +21,22 @@
 #include "imports.h"
 #include "sysmem.h"
 
-u32 g_p2_size = 24;
-u32 g_p9_size = 0; //24;
+
 int sctrlHENSetMemory(u32 p2, u32 p9)
 {
-    if(p2 != 0 && (p2 + p9) <= MAX_HIGH_MEMSIZE) {
-        g_p2_size = p2;
-        g_p9_size = p9;
-    }
     return 0;
 }
 
 // Get HEN Version
 int sctrlHENGetVersion()
 {
-    return PRO_VERSION;
+    return ( (ARK_MAJOR_VERSION << 24) | (ARK_MINOR_VERSION << 16) | ARK_MICRO_VERSION << 8 );
 }
 
 // Get HEN Minor Version
 int sctrlHENGetMinorVersion()
 {
-    return ( (ARK_MAJOR_VERSION << 16) | (ARK_MINOR_VERSION << 8) | ARK_MICRO_VERSION );
+    return ARK_REVISION;
 }
 
 int sctrlHENIsSE()
@@ -206,6 +201,7 @@ u32 sctrlHENGetInitControl()
 
 void sctrlHENTakeInitControl(int (* ictrl)(void *))
 {
+    /*
     u32* initcontrol = (u32*)sctrlHENGetInitControl();
     u32 text_addr = initcontrol[0];
     u32* bootinfo = (u32*)(initcontrol[1]);
@@ -231,6 +227,7 @@ void sctrlHENTakeInitControl(int (* ictrl)(void *))
 	bootinfo[2]++; // nextmodule
 
 	flushCache();
+    */
 }
 
 u32 sctrlHENFindImport(const char *szMod, const char *szLib, u32 nid)
@@ -280,10 +277,8 @@ void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int fl
 
 void sctrlHENSetSpeed(int cpuspd, int busspd)
 {
-    u32 k1 = pspSdkSetK1(0);
-    int (*_scePowerSetClockFrequency)(int, int, int);
-    _scePowerSetClockFrequency = sctrlHENFindFunction("scePower_Service", "scePower", 0x545A7F3C);
-    if (_scePowerSetClockFrequency) _scePowerSetClockFrequency(cpuspd, cpuspd, busspd);
+    int k1 = pspSdkSetK1(0);
+    SetSpeed(cpuspd, busspd);
     pspSdkSetK1(k1);
 }
 
@@ -318,6 +313,7 @@ void sctrlHENRegisterLLEHandler(void* handler)
 
 int sctrlHENRegisterHomebrewLoader(void* handler)
 {
+    // register handler and patch leda
     patchLedaPlugin(handler);
     return 0;
 }

@@ -22,11 +22,18 @@ typedef struct {
     unsigned char redirect_ms0; // redirect ms0 to ef0
     unsigned char vsh_fg_color; // Advanced VSH Menu Forground color
     unsigned char vsh_bg_color; // Advanced VSH Menu Background color
-    unsigned char swap_xo; // Advanced VSH Menu swap X/O buttons
+    unsigned char menusize; // Change size of dropdown system menu (triangle)
     unsigned char force_update; // Force update (disable update version check)
     unsigned char battery_percent; // show remaing battery percent next to battery icon
     unsigned char startbtn; // Default (normal start button behaviour or boot last game)
     char last_game[128];    // last played game
+    unsigned char vsh_font; // font used by VSH Menu
+    char browser_dir[128]; // default directory when using file browser as main app
+    unsigned char show_hidden; // show hidden files/folders
+    unsigned char browser_icon0; // display ICON0 in File Browser
+    unsigned char show_size; // show file size in browser
+    unsigned char show_path; // show device in game manager title for GO, whether the game is on ef0 or ms0 
+    unsigned char window_mode; // Choose whether to use the Classic VSH Menu Design or the new look
 } t_conf;
 
 #endif

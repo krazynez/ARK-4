@@ -1,5 +1,5 @@
 # Number of Compilation Threads
-OPT=-j8
+OPT=-j$(shell nproc)
 
 PYTHON = $(shell which python3)
 ARKROOT ?= $(CURDIR)
@@ -24,7 +24,9 @@ SUBDIRS = libs \
 	core/compat/pentazemin \
 	loader/live/user/linkless_payload \
 	loader/live/user/signed_eboot \
+	loader/live/user/psxloader \
 	loader/live/kernel/kernel_loader \
+	loader/live/kernel/psxloader \
 	loader/live/kernel/chain_loader \
 	loader/live/kernel/kram_dumper \
 	loader/live/kernel/idstorage_dumper \
@@ -36,6 +38,7 @@ SUBDIRS = libs \
 	loader/perma/cipl/mainbinex \
 	loader/perma/cipl/combine \
 	loader/perma/cipl/installer \
+	loader/perma/cipl/installer_devtool \
 	loader/dc/dcman \
 	loader/dc/msipl/payloadex \
 	loader/dc/msipl/mainbinex \
@@ -46,12 +49,14 @@ SUBDIRS = libs \
 	extras/installer \
 	extras/menus/arkMenu \
 	extras/menus/recovery \
+	extras/menus/recovery_classic \
 	extras/menus/xMenu \
 	extras/menus/advancedvsh \
-	extras/menus/provsh \
+	extras/modules/peops \
 	extras/modules/xmbctrl \
 	extras/modules/usbdevice \
-	extras/modules/idsregeneration
+	extras/modules/idsregeneration \
+	extras/modules/kbooti_update
 
 .PHONY: subdirs $(SUBDIRS) cleanobj clean cleanobj copy-bin mkdir-dist encrypt-prx
 
@@ -60,42 +65,55 @@ all: subdirs newcipl kxploits mkdir-dist encrypt-prx copy-bin
 
 copy-bin:
 #	Common installation
-	$(Q)cp loader/live/user/signed_eboot/EBOOT.PBP dist/ARK_Live/EBOOT.PBP # Signed EBOOT
-	$(Q)cp loader/live/kernel/kxploit/psp660/K.BIN dist/ARK_Live/K.BIN # Kernel exploit for PSP
-	$(Q)cp loader/live/user/vitabubble/PBOOT.PBP dist/Vita/Standalone/ # Vita 3.60 PBOOT.PBP bubble
-	$(Q)cp loader/live/kernel/kxploit/vita360/K.BIN dist/Vita/Standalone/K.BIN # Kernel exploit for Vita 3.60+
-	$(Q)cp loader/live/kernel/kxploit/cfw/K.BIN dist/Vita/Adrenaline/K.BIN # kxploit for CFW
+	$(Q)cp loader/live/user/signed_eboot/EBOOT.PBP dist/ARK_Loader/EBOOT.PBP # Signed EBOOT
+	$(Q)cp loader/live/user/signed_eboot/ark_loader.iso dist/PSVita/Standalone/
+	$(Q)cp loader/live/kernel/kxploit/psp660/K.BIN dist/ARK_Loader/K.BIN # Kernel exploit for PSP
+	$(Q)cp loader/live/user/psxloader/ps1cfw_enabler.suprx dist/PSVita/PS1CFW/
+	$(Q)cp loader/live/user/psxloader/EBOOT.PBP dist/PSVita/PS1CFW/SCPS10084/
+	$(Q)cp loader/live/kernel/kxploit/cfw/K.BIN dist/PSVita/Adrenaline/K.BIN # kxploit for CFW
 	$(Q)cp loader/perma/infinity/EBOOT.PBP dist/PSP/Infinity/ # Infinity with ARK support
 	$(Q)cp loader/perma/infinity/EBOOT_GO.PBP dist/PSP/Infinity/ # Infinity with ARK support (PSP Go)
 	$(Q)cp -r contrib/PSP/SAVEDATA/ARK_01234/ dist/ # ARK Savedata installation
 	$(Q)cp loader/live/kernel/chain_loader/ARK.BIN dist/ARK_01234/ARK.BIN # ARK-2 chainloader
 	$(Q)cp loader/live/kernel/kernel_loader/ARK4.BIN dist/ARK_01234/ARK4.BIN # ARK-4 loader
-	$(Q)cp loader/live/kernel/kxploit/dummy/K.BIN dist/ARK_01234/K.BIN # Dummy Kernel exploit
+	$(Q)cp loader/live/kernel/psxloader/ARKX.BIN dist/ARK_01234/ARKX.BIN # ARK-X loader
+	$(Q)cp loader/live/kernel/kxploit/vita360/K.BIN dist/ARK_01234/K.BIN # Kernel exploit for Vita 3.60+
 	$(Q)cp loader/live/user/linkless_payload/H.BIN dist/ARK_01234/H.BIN # game exploit loader
 	$(Q)cp -r contrib/PSP/GAME/ARK_DC/ dist/PSP/ # ARK DC installer
 	$(Q)cp loader/dc/installer/EBOOT.PBP dist/PSP/ARK_DC/ # ARK DC installer
-	$(Q)cp loader/perma/cipl/installer/EBOOT.PBP dist/PSP/ARK_cIPL/EBOOT.PBP
-	$(Q)cp extras/modules/kpspident/kpspident.prx dist/PSP/ARK_cIPL/kpspident.prx
-	$(Q)cp extras/modules/ipl_update/ipl_update.prx dist/PSP/ARK_cIPL/ipl_update.prx
+	$(Q)cp loader/perma/cipl/installer/EBOOT.PBP dist/PSP/ARK_classicIPL/EBOOT.PBP
+	$(Q)cp extras/modules/kpspident/kpspident.prx dist/PSP/ARK_classicIPL/kpspident.prx
+	$(Q)cp extras/modules/ipl_update/ipl_update.prx dist/PSP/ARK_classicIPL/ipl_update.prx
+	$(Q)cp loader/perma/cipl/installer_devtool/EBOOT.PBP dist/PSP/ARK_DevTool_cIPL/EBOOT.PBP
+	$(Q)cp extras/modules/kpspident/kpspident.prx dist/PSP/ARK_DevTool_cIPL/kpspident.prx
+	$(Q)cp extras/modules/kbooti_update/kbooti_update.prx dist/PSP/ARK_DevTool_cIPL/kbooti_update.prx
 	$(Q)cp loader/perma/newcipl/installer/EBOOT.PBP dist/PSP/ARK_newIPL/EBOOT.PBP
 	$(Q)cp extras/modules/kpspident/kpspident.prx dist/PSP/ARK_newIPL/kpspident.prx
 	$(Q)cp extras/modules/ipl_update/ipl_update.prx dist/PSP/ARK_newIPL/ipl_update.prx
 	$(Q)cp extras/menus/recovery/EBOOT.PBP dist/ARK_01234/RECOVERY.PBP # Default recovery menu
+	$(Q)cp extras/menus/recovery_classic/ark_recovery.prx dist/ARK_01234/RECOVERY.PRX # Classic recovery menu
 	$(Q)cp extras/menus/arkMenu/EBOOT.PBP dist/ARK_01234/VBOOT.PBP # Default launcher
+	$(Q)cp extras/menus/arkMenu/LANG.ARK dist/ARK_01234/LANG.ARK # Translations
 	$(Q)cp extras/menus/xMenu/EBOOT.PBP dist/ARK_01234/XBOOT.PBP # PS1 launcher
 	$(Q)cp extras/menus/arkMenu/themes/ARK_Revamped/THEME.ARK dist/ARK_01234/THEME.ARK # Launcher and Recovery resources
 	$(Q)cp extras/menus/advancedvsh/satelite.prx dist/ARK_01234/VSHMENU.PRX # New Default & Advanced VSH Menu
 	$(Q)cp extras/modules/xmbctrl/xmbctrl.prx dist/ARK_01234/XMBCTRL.PRX # XMB Control Module
-	$(Q)cp extras/modules/xmbctrl/translations/XMB_*.TXT dist/ARK_01234/ # XMB Control translation files
 	$(Q)cp extras/modules/idsregeneration/idsregeneration.prx dist/ARK_01234/IDSREG.PRX # idsregeneration
 	$(Q)cp extras/modules/usbdevice/usbdevice.prx dist/ARK_01234/USBDEV.PRX # USB Device Driver
 	$(Q)cp extras/installer/EBOOT.PBP dist/PSP/ARK_Full_Installer # Full installer
+	$(Q)cp extras/modules/peops/peops.prx dist/ARK_01234/PS1SPU.PRX
 	$(Q)cp contrib/UPDATER.TXT dist/ARK_01234/
+	$(Q)cp contrib/PSP/mediasync.prx dist/ARK_01234/MEDIASYN.PRX
+	$(Q)cp contrib/PSP/popsman.prx dist/ARK_01234/POPSMAN.PRX
+	$(Q)cp contrib/PSP/pops_01g.prx dist/ARK_01234/POPS.PRX
 	$(Q)cp -r extras/menus/arkMenu/themes dist/
+	$(Q)rm -rf dist/themes/translations
 	$(Q)cp contrib/README.TXT dist/
 	$(Q)mv dist/FLASH0.ARK dist/ARK_01234/ # flash0 package
 	$(Q)cp -r dist/ARK_01234 dist/PSP/ARK_DC/
 	$(Q)find dist/themes/ -type d -name 'resources' -exec rm -rf {} \; 2>/dev/null || true
+	$(Q)cp -r dist/ARK_01234 loader/vpk/bin/save/
+	$(Q)cd loader/vpk/bin/ && zip -r ../../../dist/PSVita/Standalone/FasterARK.vpk * && cd $(ARKROOT)
 	$(Q)$(MAKE) -C extras/updater/
 	$(Q)cp extras/updater/EBOOT_PSP.PBP dist/UPDATE/EBOOT.PBP
 
@@ -144,7 +162,9 @@ clean:
 	$(Q)$(MAKE) $@ -C libs
 	$(Q)$(MAKE) $@ -C loader/live/user/linkless_payload
 	$(Q)$(MAKE) $@ -C loader/live/user/signed_eboot
+	$(Q)$(MAKE) $@ -C loader/live/user/psxloader
 	$(Q)$(MAKE) $@ -C loader/live/kernel/kernel_loader
+	$(Q)$(MAKE) $@ -C loader/live/kernel/psxloader
 	$(Q)$(MAKE) $@ -C loader/live/kernel/chain_loader
 	$(Q)$(MAKE) $@ -C loader/live/kernel/kram_dumper
 	$(Q)$(MAKE) $@ -C loader/live/kernel/idstorage_dumper
@@ -164,13 +184,15 @@ clean:
 	$(Q)$(MAKE) $@ -C core/compat/vitapops
 	$(Q)$(MAKE) $@ -C core/compat/pentazemin
 	$(Q)$(MAKE) $@ -C extras/menus/recovery
+	$(Q)$(MAKE) $@ -C extras/menus/recovery_classic
 	$(Q)$(MAKE) $@ -C extras/menus/arkMenu
 	$(Q)$(MAKE) $@ -C extras/menus/advancedvsh
-	$(Q)$(MAKE) $@ -C extras/menus/provsh
 	$(Q)$(MAKE) $@ -C extras/menus/xMenu
+	$(Q)$(MAKE) $@ -C extras/modules/peops
 	$(Q)$(MAKE) $@ -C extras/modules/xmbctrl
 	$(Q)$(MAKE) $@ -C extras/modules/usbdevice
 	$(Q)$(MAKE) $@ -C extras/modules/ipl_update
+	$(Q)$(MAKE) $@ -C extras/modules/kbooti_update
 	$(Q)$(MAKE) $@ -C extras/modules/kpspident
 	$(Q)$(MAKE) $@ -C extras/modules/idsregeneration
 	$(Q)$(MAKE) $@ K=dummy -C loader/live/kernel/kxploit
@@ -183,6 +205,7 @@ clean:
 	$(Q)$(MAKE) $@ -C loader/perma/cipl/mainbinex
 	$(Q)$(MAKE) $@ -C loader/perma/cipl/combine
 	$(Q)$(MAKE) $@ -C loader/perma/cipl/installer
+	$(Q)$(MAKE) $@ -C loader/perma/cipl/installer_devtool
 	$(Q)$(MAKE) $@ -C loader/dc/dcman
 	$(Q)$(MAKE) $@ -C loader/dc/installer
 	$(Q)$(MAKE) $@ -C loader/dc/msipl/mainbinex
@@ -197,11 +220,13 @@ clean:
 	$(Q)-rm -rf common/utils/*.o
 	$(Q)$(MAKE) $@ -C extras/updater/
 	$(Q)$(MAKE) $@ -C extras/installer/
-	$(Q)rm extras/updater/ARK_01234.PKG | true
-	$(Q)rm extras/updater/EBOOT_PSP.PBP | true
-	$(Q)rm extras/updater/EBOOT_GO.PBP | true
+	$(Q)rm -f extras/updater/ARK_01234.PKG | true
+	$(Q)rm -f extras/updater/EBOOT_PSP.PBP | true
+	$(Q)rm -f extras/updater/EBOOT_GO.PBP | true
 	$(Q)$(PYTHON) contrib/PC/scripts/cleandeps.py
 	$(Q)find -name 'THEME.ARK' -exec rm {} \;
+	$(Q)rm -f extras/menus/arkMenu/LANG.ARK
+	$(Q)rm -rf loader/vpk/bin/save/ARK_01234
 
 subdirs: $(SUBDIRS)
 
@@ -214,25 +239,34 @@ libs:
 arkmenu: libs
 	$(Q)$(MAKE) $@ -C extras/menus/arkMenu
 
+vshmenu: libs
+	$(Q)$(MAKE) $@ -C extras/menus/advancedvsh
+
 xmenu: libs
 	$(Q)$(MAKE) $@ -C extras/menus/xMenu
 
 recovery: libs
 	$(Q)$(MAKE) $@ -C extras/menus/recovery
 
+recovery_classic: libs
+	$(Q)$(MAKE) $@ -C extras/menus/recovery_classic
+
 mkdir-dist:
 	$(Q)mkdir dist | true
 	$(Q)mkdir dist/PSP | true
-	$(Q)mkdir dist/Vita | true
+	$(Q)mkdir dist/PSVita | true
 	$(Q)mkdir dist/UPDATE | true
-	$(Q)mkdir dist/ARK_Live | true
+	$(Q)mkdir dist/ARK_Loader | true
 	$(Q)mkdir dist/PSP/Infinity | true
 	$(Q)mkdir dist/PSP/ARK_DC | true
-	$(Q)mkdir dist/PSP/ARK_cIPL | true
+	$(Q)mkdir dist/PSP/ARK_classicIPL | true
+	$(Q)mkdir dist/PSP/ARK_DevTool_cIPL | true
 	$(Q)mkdir dist/PSP/ARK_newIPL | true
 	$(Q)mkdir dist/PSP/ARK_Full_Installer | true
-	$(Q)mkdir dist/Vita/Adrenaline | true
-	$(Q)mkdir dist/Vita/Standalone | true
+	$(Q)mkdir dist/PSVita/Adrenaline | true
+	$(Q)mkdir dist/PSVita/Standalone | true
+	$(Q)mkdir dist/PSVita/PS1CFW | true
+	$(Q)mkdir dist/PSVita/PS1CFW/SCPS10084 | true
 
 -include $(ARKROOT)/.config
 include $(ARKROOT)/common/make/quiet.mak

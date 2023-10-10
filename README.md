@@ -6,12 +6,60 @@ Simple to use and full of unique features, `ARK CFW` aims at keeping the `PSP` e
 as well as unique and exclusive new features not found anywhere else.
 
 ### Table of Contents (Quick Links)
+<<<<<<< HEAD
   * [FEATURES](#features)
   * [INSTALLATION](#installation)
     * [Manual installation  ](#manual-installation)
   * [CUSTOMIZATION](#customization)
     * [Custom Themes](#custom-themes)
   * [Other](#other)
+=======
+  
+
+<br/>
+<a style="font-weight: bold; font-size:18px; text-decoration: underline; color: green;" href="https://github.com/PSP-Archive/ARK-4/wiki">→ ARK-4 WIKI (Recommended for more in-depth Instructions) ←</a>
+
+<br>
+<br>
+<br>
+
+
+  * [FEATURES:](#features)
+  * [INSTALLATION](#installation)
+      - [Compiling ARK ( For Developers )](#compiling-ark--for-developers-)
+      - [On PSP](#on-psp)
+          + [Online PSP Installer](#online-psp-installer)
+          + [Initial installation  ](#initial-installation)
+          + [Permanent CFW via cIPL](#permanent-cfw-via-cipl)
+        * [Permanent CFW via Infinity](#permanent-cfw-via-infinity)
+        * [Full Flash Installation](#full-flash-installation)
+        * [Time Machine and Despertar del Cementerio](#time-machine-and-despertar-del-cementerio)
+      - [On PS Vita](#on-ps-vita)
+        * [Standalone](#standalone)
+        * [Adrenaline](#adrenaline)
+      - [Legacy Game Exploits (PSP & Vita)](#legacy-game-exploits-psp--vita)
+
+  * [UPDATING ARK](#update-ark)
+
+  * [RECOVERY](#recovery)
+      - [Recovery Menu](#recovery-menu)
+      - [Vanilla Mode](#vanilla-mode)
+      - [Official Firmware Mode](#official-firmware-for-psp-permanent-installations)
+      - [Pandora/BaryonSweeper](#pandora-or-baryon-sweeper-for-psp)
+
+  * [CUSTOMIZATION](#customization)
+      - [Advanced VSH Menu Options](#advanced-vsh-menu-options)
+      - [Installing Plugins](#installing-plugins)
+      - [Configuration and Settings](#configuration-and-settings)
+      - [Custom Launcher](#custom-launcher)
+      - [Custom Themes](#custom-themes)
+      - [Other Launchers](#other-launchers)
+  * [Other](#other)
+      - [History](#history)
+      - [Changelog](#changelog)
+      - [Credits](#credits)
+      - [Warnings](#warnings)
+>>>>>>> refs/remotes/origin/main
 
 ## FEATURES:
 
@@ -21,7 +69,7 @@ as well as unique and exclusive new features not found anywhere else.
 
 - `Popcorn` controller for custom `PS1` games. Compatible with `PopsLoader` V3 and V4i.
 
-- Built-in `No-DRM` engine `Stargate`, fixes many anti-CFW games. Compatible with `npdrm_free` by qwikrazor87.
+- Built-in `No-DRM` engine `Stargate`, fixes many anti-CFW games. Compatible with `npdrm_free` and `nploader`.
 
 - `Plugin` support for `PSP` games, `PS1` games and `VSH` (XMB), including the ability to enable and disable plugins `per-game`.
 
@@ -37,7 +85,7 @@ as well as unique and exclusive new features not found anywhere else.
 
 - Can be fully installed and booted on memory stick in compatible models via `Time Machine`.
 
-- Can be used to unbrick any PSP using `Despertar del Cementerio` in combination with a `Pandora` or `Baryon Sweeper`.
+- Can be used to unbrick compatible PSP models using `Despertar del Cementerio` in combination with a `Pandora` or `Baryon Sweeper`.
 
 - `Minimalistic`: only 6 files installed on PSP flash, CFW extensions are installed on memory stick.
 
@@ -53,23 +101,29 @@ as well as unique and exclusive new features not found anywhere else.
 
 - Compatible with `cIPL` and `Infinity 2` bootloaders for permanent CFW.
 
+- `OTA` updates. Fully updateable via the internet.
+
 ![ARK Custom Firmware](.github/screenshots/xmb(10).png "ARK Custom Firmware")
 
 ![ARK Custom Firmware](.github/screenshots/xmb(11).png "ARK Custom Firmware")
 
-![ARK Custom Firmware](.github/screenshots/xmb(9).png "ARK Custom Firmware")
+![ARK Custom Firmware](.github/screenshots/pic_0016.bmp "ARK Custom Firmware")
 
 
 ## INSTALLATION
 
 - Download the precompiled binaries from: https://github.com/PSP-Archive/ARK-4/releases/latest
+- You can follow this video with instructions to install `ARK` on `PSP` via `Infinity` and/or on `PS Vita` via `Adrenaline`: https://youtu.be/bE8mw7RRqGo
 
 
-<details>
-  <summary> <b> Compiling ARK ( For Developers ) </b> </summary>
+#### Compiling ARK ( For Developers )
 <p>
 
     Build script will allow you to use the correct SDK that ARK was built with.
+
+- Docker container: `docker pull docker.io/krazynez/ark-4:latest`
+
+<p><b>These are utlized either with cloning the repo or using the Docker container</b></p>
 
 - Release: `./build.sh` 
 - Debug: `./build.sh --debug`
@@ -78,96 +132,64 @@ as well as unique and exclusive new features not found anywhere else.
 Use `-h` or `--help` to show all available flags 
 
 </p>
-</details>
 
-<details>
-  <summary> <b> On PSP </b> </summary>
+#### On PSP
 <p>
 
-<details>
-  <summary> <b> Online PSP Installer </b> </summary>
-<p>
-  For an easy deployment of ARK on a PSP connected to the internet, you can follow this video:
-  https://www.youtube.com/watch?v=mopy1N57DlI
+###### Online PSP Installer
+For an easy deployment of ARK on a PSP connected to the internet, you can follow this [video](https://www.youtube.com/watch?v=mopy1N57DlI)
 
-</p>
-</details>
 
-##### Manual installation  
+###### Initial installation  
   
 The instructions are as follows:
   
-- Install `ARK_01234` folder into `/PSP/SAVEDATA/` folder.
-- Install `ARK_Live` folder into `/PSP/GAME/` folder.
+- Move or copy `ARK_01234` folder into `/PSP/SAVEDATA/` folder.
+- Move or copy `ARK_Loader` folder into `/PSP/GAME/` folder.
 - Launch `ARK Loader`. It will install ARK modules on PSP Flash and boot the CFW.
+- At this point `ARK` will work as a `Live CFW`, meaning that `ARK Loader` will need to be run every time the console is turned off or rebooted.
+- To convert `ARK` into a `Permanent CFW` you can use either `cIPL` or `Infinity`, along with the `Full Installer` for a complete permanent experience.
 
-<details>
-  <summary> <b> Live CFW </b> </summary>
+###### Permanent CFW via cIPL
 <p>
 
-  - Delete `FLASH0.ARK` from `/PSP/SAVEDATA/ARK_01234` to prevent flashing files every time you reload the CFW.
-  - Run `ARK Loader` every time you power off or hard reboot the device to re-enable `ARK`.
-
-</p>
-</details>
-
-<details>
-  <summary> <b> Permanent CFW via new cIPL </b> </summary>
-<p>
-
-  - Works on 1K models, 2K models and early 3K models (1g, 2g and 3g).
-  - Use `pspident` homebrew to identify your model and compatibility with custom IPL.
-  - Move or copy `ARK_newIPL` folder to `/PSP/GAME/` and run the program.
-  - Press the corresponding button in the installation page to install the cIPL patch.
-  - Warning: unlike classic cIPL, the new method can't be easily uninstalled.
-
-</p>
-</details>
-
-<details>
-  <summary> <b> Permanent CFW via classic cIPL </b> </summary>
-<p>
-
-  - Only works on 1K models and early 2K models (those compatible with Pandora).
-  - Use `pspident` homebrew to identify your model and compatibility with custom IPL.
-  - Copy `ARK cIPL` folder to `/PSP/GAME/` and run the program.
+  - `New cIPL`: works on `1g`, `2g` and `3g` models on `6.61`.
+  - `Classic cIPL`: works on `Pandora` compatbile models (`1g` and early `2g`) on `6.60`, `6.61` or `6.60 Testing Tool`.
+  - `DevTool cIPL`: works on `DTP-T1000` devkit units on `6.60 Development Tool` firmware.
+  - cIPL will not install if not compatible, so no risk if running it even if you're unsure what specific model you're using - if not compatible, use `Infinity 2` instead.
+  - Move or copy either `ARK_newIPL`, `ARK_classicIPL` or `ARK_Devtool_cIPL` folder to `/PSP/GAME/` and run the program.
   - Press the corresponding button in the installation page to install or remove the cIPL patch.
+  - Warning: unlike classic cIPL, the new cIPL method can't be easily uninstalled. To revert to offical IPL, use ChronoSwitch to reinstall 6.61 OFW.
 
 </p>
-</details>
 
-<details>
-  <summary> <b> Permanent CFW via Infinity </b> </summary>
+###### Permanent CFW via Infinity
 <p>
+  <b>*RECOMMNEDED*</b> If already using another CFW with Infinity < 2.0.5, use chronoswitch to reinstall 6.60/6.61 OFW (Offical Firmware). If you do not when launching Infinity it <em>can</em> just lock your PSP up causing Infinity to not work properly (not harmful, just not properly). Then proceed with intructions. You can still bi/tri boot your CFW afterwards. 
 
   - Works on all PSP models on 6.60 or 6.61 firmwares.
   - Copy or move the `EBOOT.PBP` (or `EBOOT_GO.PBP` renamed to `EBOOT.PBP` if using a PSP Go) from the `Infinity` folder found in the ARK download into `/PSP/GAME/UPDATE`.
-  - Run the`Infinity` app using Official Firmware to run the initial installation.
+  - Run the`Infinity` app using Official Firmware to run the initial installation. If you previously had and older Infinity installed when prompted to update please do, as our Infinity version includes the ARK patches to autoboot.
   - Run `Infinity` a second time to configure autoboot by selecting ARK within the Infinity app. Run the ARK CFW again to activate. ARK will now be automatically activated on boot up.
 
 </p>
-</details>
 
-<details>
-  <summary> <b> Full Flash Installation </b> </summary>
+###### Full Flash Installation
 <p>
 
-  - This allows you to install and use most of ARK's features from flash0, allowing you to entirely remove the `ARK_01234` savedata folder or memory stick.
-  - Copy `ARK_Full_Installer` to `/PSP/GAME/` and run it from `ARK`.
-  - The modules installed on flash0 are: Satelite (VSH Menu), XMB Control (CFW settings and plugins in the XMB), IDS Regeneration (UMD Region Change) and USB Device.
-  - `Custom Launcher` and `Recovery Menu` are `NOT` installed on flash0. They are however redundant and not necessary for a feature-complete experience.
-  - Custom Firmware settings and other Custom Firmware files are installed in `ms0:/SEPLUGINS/`, which is used as the default ARK path when no savedata folder is available.
+  - This allows you to install and use all of ARK's features on the console's internal flash memory, allowing you to entirely remove the `ARK_01234` savedata folder or memory stick.
+  - Copy `ARK_Full_Installer` to `/PSP/GAME/` and run it from `ARK`. It will install some extra files into the console's flash.
+  - This installation will make use of `Classic Recovery Menu` when the regular one is not available. The minimalistic `PRO Shell` is used in place of the `Custom Launcher`.
+  - When no savedata folder is available the default ARK path used to store settings and other Custom Firmware files will be `ms0:/SEPLUGINS/`.
 
 </p>
-</details>
 
-<details>
-  <summary> <b> Time Machine and Despertar del Cementerio </b> </summary>
+###### Time Machine and Despertar del Cementerio
 <p>
 
   - `Time Machine` allows to boot the `6.61` firmware and `ARK` entirely from the Memory Stick.
   - `Despertar del Cementerio` allows to revive a bricked PSP when used in combination with a `Pandora` or `Baryon Sweeper`.
-  - To install `DC-ARK` you must first format the memory stick with at least 2048 bytes for the first (boot) sector (there are various guides on how to format a memory stick to prepare for DC).
+  - To install `DC-ARK` you must first format the memory stick leaving enough space for the boot sector. You can use `PSP Tool` to do this.
   - You also need to be running a `CFW` to install `DC-ARK` (ARK itself or any other).
   - Copy the `ARK_DC` folder to the `/PSP/GAME/` folder and run the installer from the `XMB`.
   - Follow the instructions to install DC-ARK and create a magic memory stick.
@@ -177,74 +199,48 @@ The instructions are as follows:
   - Note that installing 6.61 firmware with ARK requires a cIPL-compatible PSP (1K and early 2K).
 
 </p>
-</details>
 
 </p>
-</details>
 
-<details>
-  <summary> <b> On PS Vita </b> </summary>
+#### On PS Vita
 <p>
 
-<details>
-  <summary> <b> Standalone </b> </summary>
+###### Standalone
 <p>
 
-  - Works on Official Firmware 2.10 up to 3.74, doesn't require Henkaku/h-encore or any native hack.
-  - Download a legit `PSP` game from `PSN`, the free demo of `Ape Quest` or `LocoRoco Midnight Carnival` is recommended. `Minis` are `NOT` recommended.
-  - For Henkaku/h-encore users, install an ARK bubble using [ArkFast](https://disk.yandex.ru/d/XMJpxf7RD79VLw) (manually updated, create an issue if it's outdated).
-  - Official Firmware users (no henkaku/h-encore) can install the PBOOT bubble manually: https://github.com/TheOfficialFloW/Trinity#preparation
-  - Replace the ARK savedata folder (`ux0:pspemu/PSP/SAVEDATA/ARK_01234`) with the folder from latest release.
-  - Copy `K.BIN` from `Vita/Standalone` folder into `ARK_01234` savedata folder.
+  - Works on Firmware 3.60 up to 3.74, requires Henkaku/h-encore or any native hack.
+  - Download and install <a href="https://github.com/LiEnby/NoPspEmuDrm/releases">NoPspEmuDrm by SilicaAndPina</a> (you can use <a href="https://github.com/ONElua/AutoPlugin2/releases/latest">AutoPlugin II</a>).
+  - Copy `FasterARK.vpk` from `Vita/Standalone/` folder anywhere on your vita and install using `VitaShell`. 
+  - Open `FasterARK` and wait for the install process to finish. An `ARK` bubble will appear in `Live Area`.
+  - Once `ARK` is installed, you can delete `FasterARK`.
   - To use right analog stick (i.e. gta_remastered plugin): https://github.com/rereprep/ArkRightAnalog
   - To `exit` from a game or homebrew back to the `custom launcher`, press `L+R+Down+Start`. Works on `PSP` too.
-  - Some features are not available to Vita users, mainly the official Sony `XMB` and `PS1` games.
-  - The kernel exploit is known to have stability issues, if it fails or crashes, simply restart your Vita and try again.
-  - If you are running an old firmware (<3.60), you will need a spcialized `K.BIN`, either build one yourself or open an `Feature Request`.
+  - NOTE: Some features are not available in standalone installations, mainly the official Sony `XMB` and `Force Extra RAM` setting.
+  - NOTE: There are limitations in the playback of `PS1` games, mostly related to audio.
+  - If you want to have an `ARK` bubble that works on `Official Firmware` you must use `ChovySign`.
 
 </p>
-</details>
 
 
-<details>
-  <summary> <b> Adrenaline </b> </summary>
+###### Adrenaline
 <p>
 
   - Works on Firmware 3.60 up to 3.74, requires Henkaku/h-encore and `Adrenaline` (https://github.com/TheOfficialFloW/Adrenaline).
   - Install `ARK_01234` folder into `/PSP/SAVEDATA/` folder.
-  - Install `ARK_Live` folder into `/PSP/GAME/` folder.
-  - Copy `K.BIN` from `Vita/Adrenaline` folder into `ARK_Live` game folder.
-  - Open `Adrenaline`, (optionally) create a `savestate` to easily go back.
-  - Launch `ARK Loader` from within `Adrenaline` and wait for it to load.
-  - (Optionally) Create a `savestate` using `Adrenaline`'s built-in menu to easily load ARK.
-  - (Optionally) Use `savestates` to easily and quickly switch between `Adrenaline` and `ARK`.
-  - You can use `Adrenaline Bubbles Manager` to create an autoboot bubble for `ARK Loader`, allowing you to easily and directly boot into `Adrenaline-ARK`.
+  - Install `ARK_Loader` folder into `/PSP/GAME/` folder.
+  - Delete `K.BIN` from `ARK_Loader` folder. You can optionally copy `K.BIN` from `PSVita/Adrenaline` folder into `ARK_Loader` game folder for a bit faster loading.
+  - Use `Adrenaline Bubbles Manager` to create an autoboot bubble for `ARK Loader`: https://github.com/ONElua/AdrenalineBubbleManager/releases
   - Note: this does not permanently modify `Adrenaline` in any way.
 
 </p>
-</details>
 
 
 </p>
-</details>
 
-<details>
-  <summary> <b> Update ARK </b> </summary>
+#### Legacy Game Exploits (PSP & Vita)
 <p>
 
-There are three ways to update `ARK`:
-
-  - Use the `System Update` feature in the `XMB` or the `Custom Launcher`. Requires your PSP/Vita to be connected to the internet.
-  - Copy the `UPDATE` folder to `/PSP/GAME/` and run it.
-  - Copy `ARK_01234` folder and (on PSP) run `ARK Loader` again to install new flash0 files.
-
-</p>
-</details>
-  
-<details>
-  <summary> <b> Legacy Game Exploits (PSP & Vita) </b> </summary>
-<p>
-
+- This is mainly for `developers`.
 - Considering the savedata exploit loads `H.BIN` from the savedata path.
 - Copy every file from `ARK_01234` except `PARAM.SFO`, `SAVEDATA.BIN` and `K.BIN` (`ICON0.PNG` can also be ignored), into the hacked savedata folder.
 - You need to have a `K.BIN` if you are running on an ancient Vita firmware (there's plenty of kernel exploit sources in ARK-2 and ARK-3 for reference).
@@ -252,18 +248,84 @@ There are three ways to update `ARK`:
 - If you have issues with stability, it might be necessary to run `freemem()` algorithm in the kernel exploit file (`K.BIN`).
   
 </p>
-</details>
+
+#### Update ARK
+<p>
+
+There are three ways to update ARK:
+
+  - Option 1: Use the `System Update` feature in the `XMB` or the `Network` tab in `Custom Launcher` to perform an `OTA` update. Requires your PSP/Vita to be connected to the internet.
+  - Option 2: Copy the `UPDATE` folder to `/PSP/GAME/` and run it.
+  - Option 3: Copy `ARK_01234` folder and (on PSP) run `ARK Loader` again to install new flash0 files. If running a `Full Installation` you will need to run the `Full Installer` again to flash the extra modules.
+
+The `OTA` updater has the server URL stored in a file named `UPDATER.TXT` inside `ARK_01234`. This allows the user to change their update server if they wish to use a custom one. For example, by adding `/test` at the end of the URL will make it point to the `pre-release` server, allowing you to install the latest build of ARK synchronized with the last commit on the main branch (these release may be `unstable` so act with care).
+
+</p>
+
+## RECOVERY
+
+There are various ways to recover from a bad installation, usually result of `bad configuration` or `misbehaving plugins`, which may lead to `crashes` and even `bricks`.
+
+#### Recovery Menu
+This option allows you to boot up a `Recovery App` with settings and plugins completely disabled to prevent issues. You can use this app to change settings, plugins and use a file browser for various recovery operations.
+
+<p></p>
+
+The `Recovery App` is installed on `Memory Stick` located at `/PSP/SAVEDATA/ARK_01234/RECOVERY.PBP` and can be changed to just about any homebrew in `PBP` format.
+
+<p></p>
+
+To load into the `Recovery App` you must hold the `R trigger` while turning on the `PSP` console or running `ARK Loader`. You can also do the same when running any of the `Bubbles` on `PS Vita`, either `Adrenaline` or `Standalone` (except for `ARK-X`).
+
+<p></p>
+
+When using a `Full Installation` on `PSP` and no `Recovery App` is available, `ARK` will load the `Classic Recovery Menu` from `flash0`, which includes `PRO Shell`, a minimalistic `File Manager` and `Launcher`.
+
+<p style="font-weight:bold;">Classic Recovery</p>
+<img src=".github/screenshots/classic_recovery_menu.jpg" width="450"></a>
+
+<p style="font-weight:bold;">Pro Shell</p>
+<img src=".github/screenshots/pro_shell.jpg" width="450"></a>
+
+#### Vanilla Mode
+If the `Recovery App` is unavailable, or for a better/easier diagnostics, you can run `ARK` in `Vanilla Mode`, which temporarily disables settings and plugins when running `ARK` or booting any game.
+
+<p></p>
+
+This will load the `XMB` as original as possible but you can still use features such as the `VSH Menu` or `XMB Control` (which will let you reconfigure all your settings and plugins), it also works for games.
+
+<p></p>
+
+To enable `Vanilla Mode` simply hold `select` and/or `start` during bootup or gameboot to disable settings and plugins respectively.
+
+<p></p>
+
+The effect of `Vanilla Mode` is temporary and goes away on the next game boot or reboot unless you enable it again.
+
+#### Official Firmware (for PSP Permanent Installations)
+For any `PSP` user that has a `Permanent` installation (i.e. `Infinity` or `cIPL`), you always have the option to boot the console in `Official Firmware` mode, which completely disables all `Custom Firmware` functionality until the next full reboot.
+
+#### Pandora or Baryon Sweeper (for PSP)
+If the console is `Bricked` and none of the above helps recovering the system, the last resort is to use a `Pandora Battery` or `Baryon Sweeper` in combination with a `Magic Memory Stick`.
+
+<p></p>
+
+You can find steps to install `Despertar del Cementerio` for `Pandora` models in this document.
+
+<p></p>
+
+For `Baryon Sweeper` users, you can use this tutorial: https://www.psx-place.com/threads/update-baryon-sweeper-unbrick-psp-1000-2000-3000-psp-slim-04g-07g-09g-psp-street-11g-model.32503/
+
 
 ## CUSTOMIZATION
 
-<details>
-  <summary> <b> Advanced VSH Menu Options</b> </summary>
+#### Advanced VSH Menu Options
 <p>
 
 The default VSH menu packaged in `ARK_01234` is a simplified, easier to use version of classic VSH menus.
 To have a more classic VSH menu with more advanced features you can select the `Advanced VSH Menu` from within the simplified VSH menu.
 
-![Advanced VSH Menu](.github/screenshots/xmb(8).png "Advanced VSH Menu")
+![Advanced VSH Menu](.github/screenshots/pic_0014.bmp "Advanced VSH Menu")
 
 Some of the features available in Advanced VSH Menu include:
 
@@ -289,14 +351,13 @@ By default, ARK's VSH Menu is installed on the Memory Stick (in `/PSP/SAVEDATA/A
 This has the limitation that you won't be able to access VSH menu without a memory stick.
 If you want to permanently install VSH Menu you need to copy `VSHMENU.PRX` to somewhere on your computer and rename it to `ark_satelite.prx`,
 which you can then copy to PSP's `flash0:/vsh/module/`, you can use the VSH Menu itself to enable flash0 via USB. The final path should be `flash0:/vsh/module/ark_satelite.prx`.
+You can also achieve the same result by using the `Full Installer`.
 
 `NOTE`: even if you install VSH Menu on flash0, the one installed on Memory Stick takes precedence in loading.
 
 </p>
-</details>
 
-<details>
-  <summary> <b> Installing Plug-Ins </b> </summary>
+#### Installing Plugins
 <p>
   
 The easiest method to install a plugin is to simply copy its `.prx` (and other files/folders the plugin needs) to its default installation folder (typically `/SEPLUGINS/` folder) and navigate to it using the `File Browser` (built into Recovery Menu and Custom Launcher). Upon opening the `.prx` file, you will be given the options to select the runlevel, or type the game ID, where the plugin loads.
@@ -366,10 +427,8 @@ Some noteworthy plugins that are compatible with ARK include (but not limited to
 
 
 </p>
-</details>
 
-<details>
-  <summary> <b> Configuration and Settings </b> </summary>
+#### Configuration and Settings
 <p>
 
 You can use the XMB and/or the Recovery Menu to easily handle CFW settings. However if you prefer you can also manually handle the settings yourself.
@@ -407,11 +466,11 @@ This also allows you to enable settings on specific games:
   - ULES01234, powersave, on
   
 </p>
-</details>
 
-<details>
-  <summary> <b> Custom Launcher </b> </summary>
 <p>
+
+#### Custom Launcher
+  
 ARK comes prepacked with a very powerful launcher with a built-in file browser and highly customizable.
 
 ![Launcher Game Menu](.github/screenshots/pic_0000.png "Launcher Game Menu")
@@ -451,11 +510,13 @@ Some of its features include:
   
 You can however change it to whatever you please. You can change the theme used by both the custom launcher and recovery menu by replacing THEME.ARK with your own.
 
-<details>
-<summary> <b> Custom Launcher Themes </b> </summary>
 <p>
 
+<<<<<<< HEAD
 ## Custom Themes
+=======
+###### Custom Themes
+>>>>>>> refs/remotes/origin/main
 You can install themes within Custom Launcher (and Recovery Menu). Just place the `themes` folder anywhere on your PSP and use the file browser in the Custom Launcher to select which theme (`THEME.ARK`) you would like to install. By selecting it a submenu will pop up asking to install it or to preview the theme without installing.
 
 <i>Orbs are animations and not part of the actual Themes </i>
@@ -464,9 +525,13 @@ Theme: ARK_Revamped
 
 ![ARK_Revamped](.github/wallpapers/ARK_Revamped.png "ARK_Revamped")
 
-Theme: RED 
+Theme: Red 
 
-![Red](.github/wallpapers/red.png "RED")
+![Red](.github/wallpapers/red.png "Red")
+
+Theme: Ubuntu 
+
+![Ubuntu](.github/wallpapers/Ubuntu.png "Ubuntu")
 
 Theme: Peace Walker 
 
@@ -483,6 +548,10 @@ Theme: Material Dark
 Theme: GX Classic
 
 ![GX Classic](.github/wallpapers/gxclassic.png "GX Classic")
+
+Theme: Jurassic Park
+
+![Jurassic Park](.github/wallpapers/Jurassic_Park.png "Jurassic Park")
 
 Theme: Classic
 
@@ -508,14 +577,31 @@ Theme: BadgerOS
 
 ![BadgerOS](.github/wallpapers/badgerOS.png "BadgerOS")
 
-</details>
+Theme: CyanogenPSP
+
+![CyanogenPSP](.github/wallpapers/CyanogenPSP.png "CyanogenPSP")
+
+Theme: Windows 7
+
+![Windows7](.github/wallpapers/Windows7.png "Windows7")
+
+Theme: Windows XP
+
+![WindowsXP](.github/wallpapers/WindowsXP.png "WindowsXP")
+
+Theme: Yokai
+
+![Yokai](.github/wallpapers/yokai.png "yokai")
 
 
-<details>
-<summary> <b> Other Launchers </b> </summary>
+
+
+###### Other Launchers
 <p>
 
-Aside from the default launcher provided, there have been many  other custom launchers created by scene members, some better looking, some with more features, some more simpler, but all of them with personality, dedication and love from the community. Here is a list of all popular menus for ARK:
+Aside from the default launcher provided, there have been many  other custom launchers created by scene members, some better looking, some with more features, some more simpler, but all of them with personality, dedication and love from the community.
+
+Here is a list of all popular menus for ARK:
 
 - ONEMenu by gdljjrod: https://github.com/ONElua/ONEmenu/releases
 
@@ -529,30 +615,60 @@ Aside from the default launcher provided, there have been many  other custom lau
 
 - pyMenu by Acid_Snake: https://wololo.net/talk/viewtopic.php?t=21942
 
+You can find a collection here: https://github.com/PSP-Archive/ARK-Launchers
 
 Note: some of these menus have not been updated or supported by their developers in a while, they may not work well with modern ARK or real PSP hardware.
 </p>
-</details>
 
 </p>
-</details>
 
 
 ## Other
 
-<details>
-  <summary> <b> Credits </b> </summary>
+#### History
+Despite being a relatively new `Custom Firmware` for the `PSP`, `ARK` has quite a history that goes back to the early days of the `PS Vita` scene.
+
+`ARK` is a `CFW` that started as a port (more like rewrite) of `PRO CFW` to the `PS Vita` (named `PROVITA`) created by the original `Team PRO` members (`Coldbird`, `Liquid Snake` and `Neur0n`).
+After the original team left, the source code of `PROVITA` was handed over to me (`Acid_Snake`) and my long time scene friend `qwikrazor87`.
+
+We quickly began a huge process of rewriting and restructuring code, more specifically a much more robust dynamic patching algorithms that would work on any 6.6X based firmware (including all Vita's ePSP firmwares). Thus `ARK-2` was born.
+
+Soon after, qwik, thefl0w and I began working on `PSX exploits`, which resulted in `TN-X` and `ARK-3` (never publicly released).
+
+Because the original `PRO CFW` hasn't been updated or maintained in a while, and it has become a little bloated and hard to work with, I decided to start working on porting `ARK` to the `PSP` since the core elements of the `CFW` are compatible with `PSP` `6.60` and `6.61` with minor changes.
+
+After lots of work getting the same `ARK` binaries to properly work on both PSP and Vita, I am proud to announce that the release of `ARK-4` is finally here!
+
+
+#### Changelog
+
+- `ARK-1`: original port/rewrite of `PRO CFW` for the `PS Vita`. Codenamed `PROVITA`. Source code can be found here: https://github.com/PSP-Archive/ARK-1-PROVita-
+- `ARK-2`: dynamic patching allows it to work with most of `PS Vita` firmwares. Source code can be found here: https://github.com/PSP-Archive/ARK-2
+- `ARK-3`: device-specific runtime allows `ARK` to run in multiple scenarios (`ePSP` and `ePSX`). Source code can be found here: https://github.com/PSP-Archive/ARK-3
+- `ARK-4`: ported to the original `PSP`. Huge amounts of improvements and fixes over previous versions.
+
+`Note`: this is a simplified `changelog`, for a full version you can visit here: https://github.com/PSP-Archive/ARK-4/blob/main/CHANGELOG.md
+
+#### Credits
 <p>
 
-- `Team PRO` (the original developers of ARK): `Coldbird`, `hrimfaxi` and `Neur0n`.
+- `Team PRO` (the original developers of ARK): `Coldbird`, `hrimfaxi` (aka. `Liquid Snake`) and `Neur0n`.
+
+- `The Ancient Gods of the PSP Scene`: mathieulth, davee, Proxima, zecoxao, among other tinkerers.
 
 - `qwikrazor87` for being such a genius and all his hard work with kernel exploits and ARK-2.
   
-- `TheFl0w` for his advancements and research in CFW development and overall contributions to the scene.
+- `TheFl0w` (aka. `Total_Noob`) for his advancements and research in CFW development and overall contributions to the scene.
 
 - `meetpatty` for his excellent work in fixing bugs and adding important features like cIPL and DevKit support as well as porting `Time Machine` and `Despertar del Cementerio`.
 
+- `SilicaAndPina` for unlocking the full potential of the PS Vita's Official PSP emulator with such great tools like `ChovySign`, `NoPspEmuDrm` and `ps1cfw_enabler`.
+
 - `Codestation` for his incredible work improving CSO speeds and creating the ZSO format.
+
+- `Krazynez` for his amazing work on `Advanced VSH Menu` and other bugfixes and features.
+
+- `pyroesp` for his excellent work improving `VSH Menu` and refactoring code.
 
 - `TheSubPlayer` for all the wonderful themes made for the custom launcher.
 
@@ -569,12 +685,8 @@ Note: some of these menus have not been updated or supported by their developers
 - Every other giant shoulder I am standing on.
 
 </p>
-</details>
 
-
-
-<details>
-  <summary> <b> Warnings </b> </summary>
+#### Warnings
 <p>
 
 - ARK comes with no warranty whatsoever. It was designed to be noob-proof, however it is possible for the universe to create an even greater noob capable of using ARK to destroy the Earth (or his PSP). I cannot be held responsible for this.
@@ -583,4 +695,3 @@ Note: some of these menus have not been updated or supported by their developers
 
 - If this software malfunctions, you can turn it off and on again.
 </p>
-</details>

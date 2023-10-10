@@ -1,6 +1,8 @@
 #ifndef __SCTRLLIBRARY_SE_H__
 #define __SCTRLLIBRARY_SE_H__
 
+#include <psptypes.h>
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -17,8 +19,8 @@ enum fakeregion
     FAKE_REGION_AMERICA = 2,
     FAKE_REGION_EUROPE = 3,
     FAKE_REGION_KOREA = 4, 
-    FAKE_REGION_UNK = 5,
-    FAKE_REGION_UNK2 = 6,
+    FAKE_REGION_UNITED_KINGDOM = 5,
+    FAKE_REGION_LATIN_AMERICA = 6,
     FAKE_REGION_AUSTRALIA = 7,
     FAKE_REGION_HONGKONG = 8,
     FAKE_REGION_TAIWAN = 9,
@@ -112,6 +114,13 @@ enum vsh_fg_colors
 	FG_LITE_WHITE 	= 28,
 };
 
+enum convert_battery
+{
+	NORMAL_TO_PANDORA	= 0,
+	PANDORA_TO_NORMAL	= 1,
+	UNSUPPORTED			= 2,
+};
+
 enum MsSpeedFlag
 {
     MSSPEED_NONE     = 0,
@@ -142,22 +151,20 @@ enum umdregion
 typedef struct _SEConfig
 {
     u32 magic;
-	u8 language;
-	u8 umdmode;
+    u8 umdmode;
     u8 clock;
     u8 vshregion;
     u8 umdregion;
     s8 usbdevice;
     u8 usbcharge;
-	u8 usbdevice_rdonly;
+    u8 usbdevice_rdonly;
     u8 hidemac;
-	u8 hidedlc;
+    u8 hidedlc;
     u8 skiplogos;
     u8 hidepics;
     u8 useownupdate;
     u8 usenodrm;
     u8 hibblock;
-    u8 noanalog;
     u8 oldplugin;
     u8 hide_cfw_dirs;
     u8 chn_iso;
@@ -168,9 +175,9 @@ typedef struct _SEConfig
     u8 launcher_mode;
     u8 disable_pause;
     u8 noled;
-	u8 vsh_fg_colors;
-	u8 vsh_bg_colors;
-	u8 swap_xo;
+	u8 noumd;
+	u8 noanalog;
+	u8 custom_update;
 } SEConfig;
 
 /**

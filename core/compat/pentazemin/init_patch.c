@@ -28,7 +28,7 @@ typedef struct {
     int nfiles;
     char bootfile[100][64]; // list of boot files
 } SonyFlashFiles;
-SonyFlashFiles* flash_files = (SonyFlashFiles*)(0x08800100);
+SonyFlashFiles* flash_files = (SonyFlashFiles*)(ARK_FLASH-sizeof(SonyFlashFiles));
 
 static int cur_file = 14;
 
@@ -67,34 +67,6 @@ int (*ARKPatchInit)(int (* module_bootstart)(SceSize, void *), void *argp) = NUL
 int AdrenalinePatchInit(int (* module_bootstart)(SceSize, void *), void *argp) {
 	u32 init_addr = ((u32)module_bootstart) - 0x1A54;
 
-	/*
-	u32 init_size = 0x3400; // aprox
-
-	int patches = 3;
-	for (u32 addr=init_addr; addr<init_addr+init_size && patches; addr+=4){
-		u32 data = _lw(addr);
-		if (data == 0x2405090B){
-			// Ignore StopInit
-			_sw(0, addr + 4);
-			patches--;
-		}
-		else if (data == 0x7C633C00){
-			// Redirect load functions to load from MS
-			u32 a = addr-68;
-			LoadModuleBufferAnchorInBtcnf = K_EXTRACT_CALL(a);
-			MAKE_CALL(a, LoadModuleBufferAnchorInBtcnfPatched);
-			_sw(0x02402821, a + 4); //move $a1, $s2
-			patches--;
-		}
-		else if (data == 0x7C633C00){
-			u32 a = addr+64;
-			_sw(0x02402021, a); //move $a0, $s2
-			MAKE_CALL(a + 16, sceKernelLoadModuleBufferBootInitBtcnfPatched);
-			patches--;
-		}
-	}
-	*/
-
 	// Ignore StopInit
 	_sw(0, init_addr + 0x18EC);
 
@@ -116,6 +88,8 @@ SceModule2* patchLoaderCore(void)
 {
     // Find Module
     SceModule2* mod = (SceModule2 *)sceKernelFindModuleByName("sceLoaderCore");
+
+	memcpy(flash_files, (void*)0x08800100, sizeof(SonyFlashFiles));
 
 	for (int i=0; i<flash_files->nfiles; i++){
 		if (strcmp(&(flash_files->bootfile[i]), "/kd/init.prx") == 0){

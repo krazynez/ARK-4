@@ -2,6 +2,8 @@
 #include <pspsysmem_kernel.h>
 #include <psputilsforkernel.h>
 #include <pspinit.h>
+#include <pspkernel.h>
+#include <pspdisplay.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
@@ -18,6 +20,8 @@ extern void exitLauncher();
 
 extern SEConfig* se_config;
 
+extern int sceKernelSuspendThreadPatched(SceUID thid);
+
 KernelFunctions _ktbl = { // for vita flash patcher
     .KernelDcacheInvalidateRange = &sceKernelDcacheInvalidateRange,
     .KernelIcacheInvalidateAll = &sceKernelIcacheInvalidateAll,
@@ -29,34 +33,6 @@ KernelFunctions _ktbl = { // for vita flash patcher
     .KernelIOMkdir = &sceIoMkdir,
     .KernelDelayThread = &sceKernelDelayThread,
 };
-
-// Return Game Product ID of currently running Game
-int sctrlARKGetGameID(char gameid[GAME_ID_MINIMUM_BUFFER_SIZE])
-{
-    // Invalid Arguments
-    if(gameid == NULL) return -1;
-    
-    // Elevate Permission Level
-    unsigned int k1 = pspSdkSetK1(0);
-    
-    // Fetch Game Information Structure
-    void * gameinfo = SysMemForKernel_EF29061C_Fixed();
-    
-    // Restore Permission Level
-    pspSdkSetK1(k1);
-    
-    // Game Information unavailable
-    if(gameinfo == NULL) return -3;
-    
-    // Copy Product Code
-    memcpy(gameid, gameinfo + 0x44, GAME_ID_MINIMUM_BUFFER_SIZE - 1);
-    
-    // Terminate Product Code
-    gameid[GAME_ID_MINIMUM_BUFFER_SIZE - 1] = 0;
-    
-    // Return Success
-    return 0;
-}
 
 // This patch injects Inferno with no ISO to simulate an empty UMD drive on homebrew
 int sctrlKernelLoadExecVSHWithApitypeWithUMDemu(int apitype, const char * file, struct SceKernelLoadExecVSHParam * param)
@@ -136,6 +112,8 @@ void ARKVitaOnModuleStart(SceModule2 * mod){
 
     // System fully booted Status
     static int booted = 0;
+
+    patchFileManagerImports(mod);
     
     patchGameInfoGetter(mod);
 
@@ -144,7 +122,7 @@ void ARKVitaOnModuleStart(SceModule2 * mod){
     {
         REDIRECT_FUNCTION(sctrlHENFindFunction(mod->modname, "LoadExecForUser", 0x05572A5F), K_EXTRACT_IMPORT(exitLauncher));
         REDIRECT_FUNCTION(sctrlHENFindFunction(mod->modname, "LoadExecForUser", 0x2AC9954B), K_EXTRACT_IMPORT(exitLauncher));
-        REDIRECT_FUNCTION(sctrlHENFindFunction(mod->modname, "LoadExecForUser", 0x08F7166C), K_EXTRACT_IMPORT(exitLauncher));
+        //REDIRECT_FUNCTION(sctrlHENFindFunction(mod->modname, "LoadExecForKernel", 0x08F7166C), K_EXTRACT_IMPORT(exitLauncher));
         goto flush;
     }
     
@@ -155,22 +133,20 @@ void ARKVitaOnModuleStart(SceModule2 * mod){
         goto flush;
     }
     
-    /*
-    // Patch Vita Popsman
+    // Patch PSP Popsman
     if (strcmp(mod->modname, "scePops_Manager") == 0){
-        patchVitaPopsman(mod);
+        patchPspPopsman(mod);
         // Hook scePopsManExitVSHKernel
-        sctrlHENPatchSyscall((void *)sctrlHENFindFunction("scePops_Manager", "scePopsMan", 0x0090B2C8), K_EXTRACT_IMPORT(exitLauncher));
+        //sctrlHENPatchSyscall((void *)sctrlHENFindFunction("scePops_Manager", "scePopsMan", 0x0090B2C8), K_EXTRACT_IMPORT(exitLauncher));
         goto flush;
     }
     
-    // Patch POPS SPU
+    // Patch PSP POPS SPU
     if (strcmp(mod->modname, "pops") == 0)
     {
-        patchVitaPopsSpu(mod);
+        patchPspPopsSpu(mod);
         goto flush;
     }
-    */
 
     // VLF Module Patches
     if(strcmp(mod->modname, "VLF_Module") == 0)
@@ -180,7 +156,14 @@ void ARKVitaOnModuleStart(SceModule2 * mod){
         // Exit Handler
         goto flush;
     }
-       
+    if (strcmp(mod->modname, "CWCHEATPRX") == 0) {
+    	if (sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS) {
+        	hookImportByNID(mod, "ThreadManForKernel", 0x9944F31F, sceKernelSuspendThreadPatched);
+			goto flush;
+		}
+	}
+	
+
     // Boot Complete Action not done yet
     if(booted == 0)
     {
@@ -190,12 +173,20 @@ void ARKVitaOnModuleStart(SceModule2 * mod){
             // Initialize Memory Stick Speedup Cache
             if (se_config->msspeed) msstorCacheInit("ms", 8 * 1024);
 
+            // enable inferno cache
             if (se_config->iso_cache){
                 int (*CacheInit)(int, int, int) = sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0x8CDE7F95);
                 if (CacheInit){
-                    CacheInit(32 * 1024, 32, 11); // 2MB cache for PS Vita
+                    CacheInit(32 * 1024, 64, 11); // 2MB cache for PS Vita standalone
+                }
+                if (se_config->iso_cache == 2){
+                    int (*CacheSetPolicy)(int) = sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xC0736FD6);
+                    if (CacheSetPolicy) CacheSetPolicy(CACHE_POLICY_RR);
                 }
             }
+
+			
+
             
             // Apply Directory IO PSP Emulation
             patchFileSystemDirSyscall();
@@ -219,8 +210,41 @@ flush:
     flushCache();
 
 exit:
-       // Forward to previous Handler
+    // Forward to previous Handler
     if(previous) previous(mod);
+}
+
+int (*prev_start)(int modid, SceSize argsize, void * argp, int * modstatus, SceKernelSMOption * opt) = NULL;
+int StartModuleHandler(int modid, SceSize argsize, void * argp, int * modstatus, SceKernelSMOption * opt){
+
+    SceModule2* mod = (SceModule2*) sceKernelFindModuleByUID(modid);
+
+    struct {
+        char* name;
+        char* path;
+    } pops_files[] = {
+        {"scePops_Manager", "POPSMAN.PRX"},
+        {"sceMediaSync", "MEDIASYN.PRX"},
+    };
+
+    for (int i=0; i < sizeof(pops_files)/sizeof(pops_files[0]); i++){
+        if (strcmp(mod->modname, pops_files[i].name) == 0){
+            char path[ARK_PATH_SIZE];
+            strcpy(path, ark_config->arkpath);
+            strcat(path, pops_files[i].path);
+            SceIoStat stat;
+            int res = sceIoGetstat(path, &stat);
+            if (res>=0){
+                sceKernelUnloadModule(modid);
+                modid = sceKernelLoadModule(path, 0, NULL);
+                return sceKernelStartModule(modid, argsize, argp, modstatus, opt);
+            }
+        }
+    }
+
+    // forward to previous or default StartModule
+    if (prev_start) return prev_start(modid, argsize, argp, modstatus, opt);
+    return -1;
 }
 
 void PROVitaSysPatch(){
@@ -229,4 +253,7 @@ void PROVitaSysPatch(){
     initFileSystem();
     // patch loadexec to use inferno for UMD drive emulation (needed for some homebrews to load)
     patchLoadExecUMDemu();
+
+    // Register custom start module
+    prev_start = sctrlSetStartModuleExtra(StartModuleHandler);
 }

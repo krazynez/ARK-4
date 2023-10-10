@@ -79,6 +79,9 @@ int (* sceBootLfatOpen)(char * filename) = NULL;
 int (* sceBootLfatRead)(char * buffer, int length) = NULL;
 int (* sceBootLfatClose)(void) = NULL;
 
+// implementation specific patches
+extern patchRebootBuffer();
+
 // PRO GZIP Decrypt Support
 int PROPRXDecrypt(void * prx, unsigned int size, unsigned int * newsize)
 {
@@ -106,6 +109,7 @@ int PROPRXDecrypt(void * prx, unsigned int size, unsigned int * newsize)
 
 int CheckExecFilePatched(unsigned char * addr, void * arg2)
 {
+#ifndef MS_IPL
     //scan structure
     //6.31 kernel modules use type 3 PRX... 0xd4~0x10C is zero padded
     int pos = 0; for(; pos < 0x38; pos++)
@@ -117,6 +121,7 @@ int CheckExecFilePatched(unsigned char * addr, void * arg2)
             return origCheckExecFile(addr, arg2);
         }
     }
+#endif
 
     //return success
     return 0;
@@ -135,10 +140,10 @@ u32 loadCoreModuleStartCommon(u32 module_start){
     u32 decrypt_call = JAL(SonyPRXDecrypt);
     u32 check_call = JAL(origCheckExecFile);
 
+    int devkit_patched = 0;
+
     // Hook Signcheck Function Calls
-    int count = 0;
-    u32 addr;
-    for (addr = text_addr; addr<top_addr; addr+=4){
+    for (u32 addr = text_addr; addr<top_addr; addr+=4){
         u32 data = _lw(addr);
         if (data == decrypt_call){
             _sw(JAL(PROPRXDecrypt), addr);
@@ -146,9 +151,12 @@ u32 loadCoreModuleStartCommon(u32 module_start){
         else if (data == check_call){
             _sw(JAL(CheckExecFilePatched), addr);
         }
-        else if (data == 0x26E50028){
+        else if (!devkit_patched && data == 0x24040015){
             // Don't break on unresolved syscalls
-            _sw(0x00001021, addr-20);
+            u32 a = addr;
+            do { a-=4; } while (_lw(a) != 0x27BD0030);
+            _sw(0x00001021, a+4);
+            devkit_patched = 1;
         }
     }
 
@@ -220,6 +228,8 @@ u32 findRebootFunctions(u32 reboot_start){
     Dcache();
     return reboot_end;
 }
+
+extern void copyPSPVram(u32*);
 
 // Entry Point
 int _arkReboot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)

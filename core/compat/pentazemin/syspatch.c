@@ -82,8 +82,6 @@ int flashLoadPatch(int cmd)
         sceKernelDelayThread(10000);
 
         // Load FLASH0.ARK
-		RebootConfigARK* reboot_config = sctrlHENGetRebootexConfig(NULL);
-		
 		char archive[ARK_PATH_SIZE];
 		strcpy(archive, ark_config->arkpath);
 		strcat(archive, FLASH0_ARK);
@@ -274,28 +272,6 @@ int sctrlGetUsbState() {
 	return 2; // Not connected
 }
 
-/*
-u32 FindPowerFunction(u32 nid) {
-	return sctrlHENFindFunction("scePower_Service", "scePower", nid);
-}
-
-void SetSpeed(int cpu, int bus) {
-	if (cpu == 20 || cpu == 75 || cpu == 100 || cpu == 133 || cpu == 333 || cpu == 300 || cpu == 266 || cpu == 222) {
-		int (*scePowerSetClockFrequency_k)(int, int, int) = (void *)FindPowerFunction(0x737486F2);
-		scePowerSetClockFrequency_k(cpu, cpu, bus);
-
-		if (sceKernelInitKeyConfig() != PSP_INIT_KEYCONFIG_VSH) {
-			MAKE_DUMMY_FUNCTION((u32)scePowerSetClockFrequency_k, 0);
-			MAKE_DUMMY_FUNCTION((u32)FindPowerFunction(0x545A7F3C), 0);
-			MAKE_DUMMY_FUNCTION((u32)FindPowerFunction(0xB8D7B3FB), 0);
-			MAKE_DUMMY_FUNCTION((u32)FindPowerFunction(0x843FBF43), 0);
-			MAKE_DUMMY_FUNCTION((u32)FindPowerFunction(0xEBD177D6), 0);
-			flushCache();
-		}
-	}
-}
-*/
-
 void patch_VshMain(SceModule2* mod){
 	u32 text_addr = mod->text_addr;
 
@@ -317,9 +293,9 @@ void patch_SysconfPlugin(SceModule2* mod){
 	MAKE_DUMMY_FUNCTION_RETURN_0(text_addr + 0xD2C4);
 
 	// Redirect USB functions
-	MAKE_SYSCALL(mod->text_addr + 0xAE9C, sctrlStartUsb);
-	MAKE_SYSCALL(mod->text_addr + 0xAFF4, sctrlStopUsb);
-	MAKE_SYSCALL(mod->text_addr + 0xB4A0, sctrlGetUsbState);
+	REDIRECT_SYSCALL(mod->text_addr + 0xAE9C, sctrlStartUsb);
+	REDIRECT_SYSCALL(mod->text_addr + 0xAFF4, sctrlStopUsb);
+	REDIRECT_SYSCALL(mod->text_addr + 0xB4A0, sctrlGetUsbState);
 
 	// Ignore wait thread end failure
 	_sw(0, text_addr + 0xB264);
@@ -331,6 +307,24 @@ void exit_game_patched(){
 		exitLauncher();
 	else
 		sctrlKernelExitVSH(NULL);
+}
+
+int (*prevPluginHandler)(const char* path, int modid) = NULL;
+int pluginHandler(const char* path, int modid){
+    SceModule2* mod = sceKernelFindModuleByUID(modid);
+
+	static char* forbidden_plugins[] = {
+		"popsloader", "CDDA Enabler", 
+	};
+
+	for (int i=0; i<NELEMS(forbidden_plugins); i++){
+		if (strcmp(mod->modname, forbidden_plugins[i]) == 0){
+			return -1; // prevent plugin from loading
+		}
+	}
+
+	if (prevPluginHandler) return prevPluginHandler(path, modid);
+    return 0;
 }
 
 void AdrenalineOnModuleStart(SceModule2 * mod){
@@ -456,7 +450,6 @@ void AdrenalineOnModuleStart(SceModule2 * mod){
 	// load and process settings file
     if(strcmp(mod->modname, "sceMediaSync") == 0)
     {
-        se_config = sctrlSEGetConfig(NULL);
 		// apply extra memory patch
 		if (se_config->force_high_memory) unlockVitaMemory();
 		else{
@@ -474,8 +467,12 @@ void AdrenalineOnModuleStart(SceModule2 * mod){
 		if (se_config->iso_cache){
 			int (*CacheInit)(int, int, int) = sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0x8CDE7F95);
 			if (CacheInit){
-				CacheInit(32 * 1024, 32, (se_config->force_high_memory)?2:11); // 2MB cache for PS Vita
+				CacheInit(32 * 1024, 128, (se_config->force_high_memory)?2:11); // 4MB cache for Adrenaline
 			}
+			if (se_config->iso_cache == 2){
+            	int (*CacheSetPolicy)(int) = sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xC0736FD6);
+            	if (CacheSetPolicy) CacheSetPolicy(CACHE_POLICY_RR);
+        	}
         }
         goto flush;
     }
@@ -548,6 +545,10 @@ void AdrenalineSysPatch(){
     SceModule2* loadcore = patchLoaderCore();
     PatchIoFileMgr();
     PatchMemlmd();
+
+	// Register plugin handler
+    prevPluginHandler = sctrlHENSetPluginHandler(&pluginHandler);
+
 	// initialize Adrenaline Layer
     initAdrenaline();
 }

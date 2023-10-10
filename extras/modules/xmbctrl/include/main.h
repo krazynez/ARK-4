@@ -30,8 +30,11 @@
 #define sysconf_console_action 2
 #define sysconf_console_action_arg 2
 
-#define sysconf_tnconfig_action_arg 0x1000
-#define sysconf_plugins_action_arg 0x1002
+enum {
+    sysconf_tnconfig_action_arg = 0x1000,
+    sysconf_plugins_action_arg = 0x1002,
+    sysconf_custom_launcher_arg = 0x1003,
+};
 
 typedef struct
 {
@@ -39,6 +42,7 @@ typedef struct
     int usbcharge;
     int overclock;
     int powersave;
+    int defaultclock;
     int launcher;
     int disablepause;
     int highmem;
@@ -51,6 +55,8 @@ typedef struct
     int hidemac;
     int hidedlc;
     int noled;
+    int noumd;
+    int noanalog;
 } CFWConfig;
 
 typedef struct
@@ -129,11 +135,8 @@ int vshSetRegistryValue(u32 *, char *, int , int *);
 
 int sceVshCommonGuiBottomDialog(void *a0, void *a1, void *a2, int (* cancel_handler)(), void *t0, void *t1, int (* handler)(), void *t3);
 
-int sctrlSEGetConfig(CFWConfig *);
-int sctrlSESetConfig(CFWConfig *);
+int vctrlVSHExitVshMenu(void *conf);
 
-int vctrlVSHExitVshMenu(CFWConfig *);
-
-int vctrlVSHExitVSHMenu(CFWConfig *conf, char *videoiso, int disctype);
+int vctrlVSHExitVSHMenu(void *conf, char *videoiso, int disctype);
 
 #endif

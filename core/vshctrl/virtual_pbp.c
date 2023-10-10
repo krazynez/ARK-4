@@ -21,8 +21,8 @@
 #include <pspsdk.h>
 #include <pspthreadman_kernel.h>
 #include <pspumd.h>
-#include "systemctrl.h"
-#include "systemctrl_se.h"
+#include <systemctrl.h>
+#include <systemctrl_se.h>
 #include "systemctrl_private.h"
 #include "isoreader.h"
 #include "strsafe.h"
@@ -170,6 +170,7 @@ static int is_iso(SceIoDirent * dir)
         //check extension
         if (
                 stricmp(ext, ".iso") == 0 ||
+                stricmp(ext, ".img") == 0 ||
                 stricmp(ext, ".cso") == 0 ||
                 stricmp(ext, ".zso") == 0 ||
                 stricmp(ext, ".dax") == 0 ||
@@ -942,14 +943,17 @@ int vpbp_getstat(const char * file, SceIoStat * stat)
     return ret;
 }
 
-static int has_prometheus_module(VirtualPBP *vpbp)
+int has_prometheus_module(const char *isopath)
 {
     int ret;
     u32 size, lba;
+
+    int k1 = pspSdkSetK1(0);
     
-    ret = isoOpen(vpbp->name);
+    ret = isoOpen(isopath);
 
     if (ret < 0) {
+        pspSdkSetK1(k1);
         return 0;
     }
 
@@ -958,17 +962,20 @@ static int has_prometheus_module(VirtualPBP *vpbp)
 
     isoClose();
 
+    pspSdkSetK1(k1);
     return ret;
 }
 
-static int has_update_file(VirtualPBP* vpbp, char* update_file){
+int has_update_file(const char* isopath, char* update_file){
     // game ID is always at offset 0x8373 within the ISO
     int lba = 16;
     int pos = 883;
 
     char game_id[10];
 
-    isoOpen(vpbp->name);
+    int k1 = pspSdkSetK1(0);
+
+    isoOpen(isopath);
     isoRead(game_id, lba, pos, 10);
     isoClose();
 
@@ -981,20 +988,20 @@ static int has_update_file(VirtualPBP* vpbp, char* update_file){
     game_id[9] = 0;
 
     // try to find the update file
-    char path[256];
-    char* devs[] = {"ms0:", "ef0:"};
+    static char* devs[] = {"ms0:", "ef0:"};
 
     for (int i=0; i<2; i++){
-        sprintf(path, "%s/PSP/GAME/%s/PBOOT.PBP", devs[i], game_id);
-        int fd = sceIoOpen(path, PSP_O_RDONLY, 0777);
+        sprintf(update_file, "%s/PSP/GAME/%s/PBOOT.PBP", devs[i], game_id);
+        int fd = sceIoOpen(update_file, PSP_O_RDONLY, 0777);
         if (fd >= 0){
             // found
             sceIoClose(fd);
-            if (update_file) strcpy(update_file, path);
+            pspSdkSetK1(k1);
             return 1;
         }
     }
     // not found
+    pspSdkSetK1(k1);
     return 0;
 }
 
@@ -1128,7 +1135,7 @@ int vpbp_loadexec(char * file, struct SceKernelLoadExecVSHParam * param)
     apitype = 0x123;
 
     static char pboot_path[256];
-    int has_pboot = has_update_file(vpbp, pboot_path);
+    int has_pboot = has_update_file(vpbp->name, pboot_path);
 
     if (has_pboot){
         // configure to use dlc/update
@@ -1157,7 +1164,7 @@ int vpbp_loadexec(char * file, struct SceKernelLoadExecVSHParam * param)
             }
         }
 
-        if (has_prometheus_module(vpbp)) {
+        if (has_prometheus_module(vpbp->name)) {
             param->argp = "disc0:/PSP_GAME/SYSDIR/EBOOT.OLD";
         } else {
             param->argp = "disc0:/PSP_GAME/SYSDIR/EBOOT.BIN";

@@ -34,8 +34,8 @@ enum colors {
 
 enum images {
     IMAGE_BG,
-    IMAGE_NOICON,
     IMAGE_WAITICON,
+    IMAGE_NOICON,
     IMAGE_GAME,
     IMAGE_SETTINGS,
     IMAGE_BROWSER,
@@ -61,6 +61,13 @@ enum {
     MAX_FILE_TYPES,
 };
 
+typedef struct TextScroll{
+    float x;
+    float y;
+    float tmp;
+    float w;
+}TextScroll;
+
 #define SIZE_TINY 0.4f
 #define SIZE_LITTLE 0.51f
 #define SIZE_MEDIUM 0.6f
@@ -74,20 +81,24 @@ enum {
 
 namespace common{
 
+    extern bool is_recovery;
     extern ARKConfig* getArkConfig();
     extern int getArgc();
     extern char** getArgv();
     extern int getPspModel();
     extern struct tm getDateTime();
     extern bool has_suffix(const std::string &str, const std::string &suffix);
-    SceOff findPkgOffset(const char* filename, unsigned* size = NULL);
-    extern void* readFromPKG(const char* filename, unsigned* size = NULL);
+    SceOff findPkgOffset(const char* filename, unsigned* size = NULL, const char* pkgpath=NULL, void (*missinghandler)(const char*) = NULL);
+    extern void* readFromPKG(const char* filename, unsigned* size = NULL, const char* pkgpath=NULL);
     extern u32 getMagic(const char* filename, unsigned int offset);
     extern void loadData(int ac, char** av);
     extern void deleteData();
     extern void loadTheme();
     extern void deleteTheme();
+    extern void startLoadingThread();
+    extern void stopLoadingThread();
     extern void setThemePath(char* path = NULL);
+    extern bool isFolder(SceIoDirent* dit);
     extern bool fileExists(const std::string &path);
     extern bool folderExists(const std::string &path);
     extern long fileSize(const std::string &path);
@@ -103,8 +114,8 @@ namespace common{
     extern t_conf* getConf();
     extern void resetConf();
     extern void playMenuSound();
-    extern void printText(float x, float y, const char *text, u32 color=GRAY_COLOR, float size=SIZE_LITTLE, int glow=0, int scroll=0);
-    extern int calcTextWidth(const char* text, float size=SIZE_LITTLE);
+    extern void printText(float x, float y, const char *text, u32 color=GRAY_COLOR, float size=SIZE_LITTLE, int glow=0, TextScroll* scroll=NULL, int translate=1);
+    extern int calcTextWidth(const char* text, float size=SIZE_LITTLE, int translate=1);
     extern void clearScreen(u32 color = CLEAR_COLOR);
     extern void drawBorder();
     extern void drawScreen();

