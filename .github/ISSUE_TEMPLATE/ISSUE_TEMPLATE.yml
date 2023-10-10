@@ -67,7 +67,6 @@ body:
     attributes:
       label: USB Charge
       options:
-       - "Please Choose and Option"
        - Disabled
        - Always
        - Game
@@ -240,4 +239,13 @@ body:
         - Launcher
     validations:
        required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+    label: Verification of form.
+    description: Verify that you have indeed selected options above and filled out request properly and in full. 
+    options:
+      - label: I agree that I properly filled out the items listed above.
+        required: true
 
