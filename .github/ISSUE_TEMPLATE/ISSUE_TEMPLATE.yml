@@ -146,6 +146,10 @@ body:
     attributes:
       value: "</tr>"
 
+  - type: markdown
+    attributes:
+      value: "</table>"
+
   - type: dropdown
     id: Balanced-Energy-Mode
     attributes:
