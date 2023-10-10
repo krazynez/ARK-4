@@ -109,6 +109,7 @@ body:
        - Launcher
     validations:
       required: true
+
 <div style="display: inline-block; width=48%;">
   - type: dropdown
     id: Balanced-Energy-Mode
@@ -125,6 +126,8 @@ body:
        - Launcher
     validations:
       required: true
+</div>
+
   - type: dropdown
     id: autoboot
     attributes:
