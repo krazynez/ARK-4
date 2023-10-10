@@ -67,6 +67,7 @@ body:
     attributes:
       label: USB Charge
       options:
+       - "Please Choose and Option"
        - Disabled
        - Always
        - Game
@@ -110,7 +111,6 @@ body:
     validations:
       required: true
 
-<div style="display: inline-block; width=48%;">
   - type: dropdown
     id: Balanced-Energy-Mode
     attributes:
@@ -126,7 +126,6 @@ body:
        - Launcher
     validations:
       required: true
-</div>
 
   - type: dropdown
     id: autoboot
