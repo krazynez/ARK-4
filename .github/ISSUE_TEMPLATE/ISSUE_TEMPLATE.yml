@@ -59,7 +59,7 @@ body:
     validations:
       required: true
         
-  - type: section
+  - type: markdown
     attributes:
       label: "<h2>Recovery settings</h2>"
     layout: columns
