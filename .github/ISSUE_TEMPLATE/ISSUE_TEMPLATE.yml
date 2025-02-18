@@ -14,6 +14,7 @@ body:
       description: "Please specify which device is affected/you have."
       multiple: true
       options:
+          - Any
           - DTP-H1500 (Testing Tool)
           - DTP-T1000 (Development Unit)
           - PSP-1000 (Fat)
@@ -58,193 +59,199 @@ body:
     validations:
       required: true
         
-  - type: markdown
+  - type: selection
     attributes:
-      value: "<h2>Settings</h2>"
+      label: "<h2>Recovery settings</h2>"
+    layout: columns
+    contents:
+      - type: dropdown
+        id: usb-charge
+        attributes:
+          label: USB Charge
+          options:
+           - Disabled
+           - Always
+           - Game
+           - UMD
+           - Homebrew
+           - Pops
+           - XMB
+           - Launcher
+        validations:
+          required: true
+        
+      - type: dropdown
+        id: overclock
+        attributes:
+          label: Overclock 
+          options:
+           - Disabled
+           - Always
+           - Game
+           - UMD
+           - Homebrew
+           - Pops
+           - XMB
+           - Launcher
+        validations:
+          required: true
       
-  - type: dropdown
-    id: usb-charge
-    attributes:
-      label: USB Charge
-      options:
-       - Disabled
-       - Always
-       - Game
-       - UMD
-       - Homebrew
-       - Pops
-       - XMB
-       - Launcher
-    validations:
-      required: true
-
-  - type: dropdown
-    id: overclock
-    attributes:
-      label: Overclock 
-      options:
-       - Disabled
-       - Always
-       - Game
-       - UMD
-       - Homebrew
-       - Pops
-       - XMB
-       - Launcher
-    validations:
-      required: true
-
-  - type: dropdown
-    id: power-save
-    attributes:
-      label: Power Save
-      options:
-       - Disabled
-       - Always
-       - Game
-       - UMD
-       - Homebrew
-       - Pops
-       - XMB
-       - Launcher
-    validations:
-      required: true
-
-  - type: dropdown
-    id: Balanced-Energy-Mode
-    attributes:
-      label: Balanced Energy Mode 
-      options:
-       - Disabled
-       - Always
-       - Game
-       - UMD
-       - Homebrew
-       - Pops
-       - XMB
-       - Launcher
-    validations:
-      required: true
-
-  - type: dropdown
-    id: autoboot
-    attributes:
-      label: Autoboot Launcher
-      options:
-        - "Off"
-        - "On"
-    validations:
-      required: true
-  - type: dropdown
-    id: disable-psp-go-pause
-    attributes:
-      label: Disable PSP Go Pause
-      options:
-       - "Off"
-       - "On"
-    validations:
-      required: true
-  
-  - type: dropdown
-    id: unlock-extra-mem
-    attributes:
-      label: Unlock Extra Memory
-      options:
-       - Disabled
-       - Always
-       - Game
-       - UMD
-       - Homebrew
-       - Pops
-       - XMB
-       - Launcher
-    validations:
-      required: true
-  - type: dropdown
-    id: memory-stick-speedup
-    attributes:
-      label: Memory Stick Speedup
-      options:
-       - Disabled
-       - Alway
-       - Game
-       - UMD
-       - Homebrew
-       - Pops
-       - XMB
-       - Launcher
-    validations:
-      required: true
-  - type: dropdown
-    id: inferno-cache
-    attributes:
-      label: Inferno Cache 
-      options:
-       - "Off"
-       - LRU
-       - RR
-    validations:
-      required: true
-
-  - type: dropdown
-    id: Skip-Sony-Logos 
-    attributes:
-       label: Skip Sony Logos 
-       options:
-        - "Off"
-        - "On"
-    validations:
-       required: true
-  - type: dropdown
-    id: Hide-PIC0-and_PIC1 
-    attributes:
-       label: Hide PIC0 and PIC1
-       options:
-        - "Off"
-        - "On"
-    validations:
-       required: true
-  - type: dropdown
-    id: Hide-MAC-Address 
-    attributes:
-       label: Hide MAC Address
-       options:
-        - "Off"
-        - "On"
-    validations:
-       required: true
-
-  - type: dropdown
-    id: Hide-DLC 
-    attributes:
-       label: Hide DLC 
-       options:
-        - "Off"
-        - "On"
-    validations:
-       required: true
-  - type: dropdown
-    id: Turn-off-LEDs 
-    attributes:
-       label: Turn off LEDs 
-       options:
-        - Disabled
-        - Always
-        - Game
-        - UMD
-        - Homebrew
-        - Pops
-        - XMB
-        - Launcher
-    validations:
-       required: true
-
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Verification of form.
-      description: Verify that you have indeed selected options above and filled out request properly and in full. 
-      options:
-        - label: I agree that I properly filled out the items listed above.
+      - type: dropdown
+        id: power-save
+        attributes:
+          label: Power Save
+          options:
+           - Disabled
+           - Always
+           - Game
+           - UMD
+           - Homebrew
+           - Pops
+           - XMB
+           - Launcher
+        validations:
           required: true
 
+      - type: dropdown
+        id: Balanced-Energy-Mode
+        attributes:
+          label: Balanced Energy Mode 
+          options:
+           - Disabled
+           - Always
+           - Game
+           - UMD
+           - Homebrew
+           - Pops
+           - XMB
+           - Launcher
+        validations:
+          required: true
+
+      - type: dropdown
+        id: autoboot
+        attributes:
+          label: Autoboot Launcher
+          options:
+            - "Off"
+            - "On"
+        validations:
+          required: true
+      
+      - type: dropdown
+        id: disable-psp-go-pause
+        attributes:
+          label: Disable PSP Go Pause
+          options:
+           - "Off"
+           - "On"
+        validations:
+          required: true
+      
+      - type: dropdown
+        id: unlock-extra-mem
+        attributes:
+          label: Unlock Extra Memory
+          options:
+           - Disabled
+           - Always
+           - Game
+           - UMD
+           - Homebrew
+           - Pops
+           - XMB
+           - Launcher
+        validations:
+          required: true
+            
+      - type: dropdown
+        id: memory-stick-speedup
+        attributes:
+          label: Memory Stick Speedup
+          options:
+           - Disabled
+           - Always
+           - Game
+           - UMD
+           - Homebrew
+           - Pops
+           - XMB
+           - Launcher
+        validations:
+          required: true
+      
+      - type: dropdown
+        id: inferno-cache
+        attributes:
+          label: Inferno Cache 
+          options:
+           - "Off"
+           - LRU
+           - RR
+        validations:
+          required: true
+
+      - type: dropdown
+        id: Skip-Sony-Logos 
+        attributes:
+           label: Skip Sony Logos 
+           options:
+            - "Off"
+            - "On"
+        validations:
+           required: true
+
+      - type: dropdown
+        id: Hide-PIC0-and_PIC1 
+        attributes:
+           label: Hide PIC0 and PIC1
+           options:
+            - "Off"
+            - "On"
+        validations:
+           required: true
+
+      - type: dropdown
+        id: Hide-MAC-Address 
+        attributes:
+           label: Hide MAC Address
+           options:
+            - "Off"
+            - "On"
+        validations:
+           required: true
+
+      - type: dropdown
+        id: Hide-DLC 
+        attributes:
+           label: Hide DLC 
+           options:
+            - "Off"
+            - "On"
+        validations:
+           required: true
+
+      - type: dropdown
+        id: Turn-off-LEDs 
+        attributes:
+           label: Turn off LEDs 
+           options:
+            - Disabled
+            - Always
+            - Game
+            - UMD
+            - Homebrew
+            - Pops
+            - XMB
+            - Launcher
+        validations:
+           required: true
+
+      - type: checkboxes
+        id: terms
+        attributes:
+          label: Verification of form.
+          description: Verify that you have indeed selected options above and filled out request properly and in full. 
+          options:
+            - label: I agree that I properly filled out the items listed above.
+              required: true
